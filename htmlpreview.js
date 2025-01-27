@@ -83,6 +83,7 @@
 		if (data) {
 			var script = document.createElement('script');
 			script.innerHTML = data;
+			script.setAttribute('type', 'module');
 			document.body.appendChild(script);
 		}
 	};
