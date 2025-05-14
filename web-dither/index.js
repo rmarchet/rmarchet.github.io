@@ -4885,7 +4885,7 @@ var Controls = function Controls(_ref) {
 var styles$1 = {"logoContainer":"Footer-module_logoContainer__yp0r-"};
 
 var Footer = function Footer() {
-  var logo = '/logo.svg';
+  var logo = 'logo.svg';
   return /*#__PURE__*/jsxRuntimeExports.jsxs("footer", {
     className: styles$1.logoContainer,
     children: [/*#__PURE__*/jsxRuntimeExports.jsx("img", {
