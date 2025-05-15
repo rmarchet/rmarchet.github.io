@@ -3665,24 +3665,37 @@ var applyWaveform = function applyWaveform(image, settings) {
   var _settings$noise = settings.noise,
     noise = _settings$noise === void 0 ? 0 : _settings$noise,
     _settings$amplitude = settings.amplitude,
-    amplitude = _settings$amplitude === void 0 ? 64 : _settings$amplitude,
+    amplitude = _settings$amplitude === void 0 ? 1 : _settings$amplitude,
     _settings$frequency = settings.frequency,
     frequency = _settings$frequency === void 0 ? 0.08 : _settings$frequency,
     _settings$phase = settings.phase,
     phase = _settings$phase === void 0 ? 0 : _settings$phase;
-  // For each row, modulate the threshold using a sine wave
+  // For each pixel, modulate the displacement using a 2D sine wave
   for (var y = 0; y < height; y++) {
-    // Calculate the threshold for this row
-    var threshold = 128 + amplitude * Math.sin(frequency * y + phase);
     for (var x = 0; x < width; x++) {
+      // 2D sine wave for smooth displacement
+      var randomDisplacement = (Math.random() - 0.5) * (noise || 1) * 2; // scale as needed
+      var displacement = amplitude * 40 * Math.sin(frequency * y + phase + frequency * x);
       var idx = (y * width + x) * 4;
-      var gray = data[idx]; // Use red channel (assume grayscale input)
-      // Add noise
-      if (noise > 0) {
-        gray += (Math.random() - 0.5) * noise;
+
+      // Use floating point source position for smooth interpolation
+      var sourceX = x + displacement + randomDisplacement;
+      var x0 = Math.floor(sourceX);
+      var x1 = Math.min(x0 + 1, width - 1);
+      var t = sourceX - x0;
+      var srcIdx0 = (y * width + Math.max(0, x0)) * 4;
+      var srcIdx1 = (y * width + x1) * 4;
+
+      // Linear interpolation for each channel
+      for (var c = 0; c < 3; c++) {
+        var value = (1 - t) * data[srcIdx0 + c] + t * data[srcIdx1 + c];
+        // Add noise if enabled
+        if (noise > 0) {
+          value += (Math.random() - 0.5) * noise * 0.5;
+        }
+        data[idx + c] = value;
       }
-      var value = gray > threshold ? 255 : 0;
-      data[idx] = data[idx + 1] = data[idx + 2] = value;
+      // Keep alpha at full
       data[idx + 3] = 255;
     }
   }
@@ -3694,6 +3707,76 @@ var waveform = {
   description: 'A filter that creates a Waveform effect (a glitch effect) over the image',
   category: DITHER_CATEGORIES.GLITCH_EFFECTS,
   handle: 'waveform'
+};
+
+var applyWaveformAlt = function applyWaveformAlt(image, settings) {
+  var data = image.data,
+    width = image.width,
+    height = image.height;
+  var _settings$amplitude = settings.amplitude,
+    amplitude = _settings$amplitude === void 0 ? 1 : _settings$amplitude,
+    _settings$frequency = settings.frequency,
+    frequency = _settings$frequency === void 0 ? 0.08 : _settings$frequency,
+    _settings$phase = settings.phase,
+    phase = _settings$phase === void 0 ? 0 : _settings$phase,
+    _settings$noise = settings.noise,
+    noise = _settings$noise === void 0 ? 0 : _settings$noise;
+
+  // Map noise (0-50) to bandHeight (0.25*height to 1*height)
+  var minBand = 0.25;
+  var maxBand = 1.0;
+  var bandFraction = minBand + (maxBand - minBand) * (noise / 50);
+  var bandHeight = Math.floor(height * bandFraction);
+  var bandCenter = Math.floor(height * (0.55 + 0.3 * Math.sin(phase)));
+  var bandStart = bandCenter - Math.floor(bandHeight / 2);
+  var bandEnd = bandStart + bandHeight;
+
+  // Helper for smooth feathering
+  function smoothstep(edge0, edge1, x) {
+    var t = Math.max(0, Math.min(1, (x - edge0) / (edge1 - edge0)));
+    return t * t * (3 - 2 * t);
+  }
+
+  // Copy original data to avoid overwriting source pixels
+  var original = new Uint8ClampedArray(data);
+  for (var y = 0; y < height; y++) {
+    // Feathering: 0 outside band, 1 in center, smooth at edges
+    var feather = 0;
+    if (y >= bandStart && y <= bandEnd) {
+      feather = smoothstep(bandStart, bandStart + bandHeight * 0.15, y) * (1 - smoothstep(bandEnd - bandHeight * 0.15, bandEnd, y));
+    }
+    for (var x = 0; x < width; x++) {
+      var idx = (y * width + x) * 4;
+      if (feather > 0) {
+        // Sine wave displacement, feathered
+        var displacement = feather * (amplitude * 40) * Math.sin(frequency * y + phase);
+        var sourceX = Math.max(0, Math.min(width - 1, x + displacement));
+        var x0 = Math.floor(sourceX);
+        var x1 = Math.min(x0 + 1, width - 1);
+        var t = sourceX - x0;
+        var srcIdx0 = (y * width + x0) * 4;
+        var srcIdx1 = (y * width + x1) * 4;
+        for (var c = 0; c < 3; c++) {
+          data[idx + c] = (1 - t) * original[srcIdx0 + c] + t * original[srcIdx1 + c];
+        }
+        data[idx + 3] = 255;
+      } else {
+        // Copy original pixel
+        data[idx] = original[idx];
+        data[idx + 1] = original[idx + 1];
+        data[idx + 2] = original[idx + 2];
+        data[idx + 3] = original[idx + 3];
+      }
+    }
+  }
+};
+
+var waveformAlt = {
+  apply: applyWaveformAlt,
+  name: 'Waveform Alt',
+  description: 'A filter that creates a Waveform effect (a glitch effect) over the image',
+  category: DITHER_CATEGORIES.GLITCH_EFFECTS,
+  handle: 'waveformAlt'
 };
 
 // Smooth Diffuse: error diffusion with a soft, normalized 3x3 kernel
@@ -4036,6 +4119,41 @@ var reededGlass = {
   handle: 'reededGlass'
 };
 
+var applyAnaglyph = function applyAnaglyph(image, settings) {
+  var data = image.data,
+    width = image.width,
+    height = image.height;
+  var amplitude = settings.amplitude * 20;
+  var frequency = settings.frequency * 10;
+
+  // Copy original data to avoid overwriting source pixels
+  var original = new Uint8ClampedArray(data);
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      var idx = (y * width + x) * 4;
+      // Offset each channel by a different amount
+      var redX = Math.max(0, Math.min(width - 1, x - Math.round(amplitude)));
+      var greenX = Math.max(0, Math.min(width - 1, x + Math.round(amplitude * frequency)));
+      var blueX = Math.max(0, Math.min(width - 1, x - Math.round(amplitude * frequency)));
+      var redIdx = (y * width + redX) * 4;
+      var greenIdx = (y * width + greenX) * 4;
+      var blueIdx = (y * width + blueX) * 4;
+      data[idx] = original[redIdx]; // Red
+      data[idx + 1] = original[greenIdx + 1]; // Green
+      data[idx + 2] = original[blueIdx + 2]; // Blue
+      data[idx + 3] = 255;
+    }
+  }
+};
+
+var anaglyph = {
+  apply: applyAnaglyph,
+  name: 'Anaglyph',
+  description: 'A filter that creates an Anaglyph effect (a glitch effect) over the image',
+  category: DITHER_CATEGORIES.GLITCH_EFFECTS,
+  handle: 'anaglyph'
+};
+
 // Default ASCII characters size
 var DEFAULT_ASCII_SIZE = 13;
 var applyAlphanumeric = function applyAlphanumeric(image, settings) {
@@ -4095,6 +4213,7 @@ var alphanumeric = {
 var dither = /*#__PURE__*/Object.freeze({
 	__proto__: null,
 	alphanumeric: alphanumeric,
+	anaglyph: anaglyph,
 	atkinson: atkinson,
 	atkinsonVHS: atkinsonVHS,
 	bayer: bayer,
@@ -4133,7 +4252,8 @@ var dither = /*#__PURE__*/Object.freeze({
 	stucki: stucki,
 	stukiDiffusionLines: stukiDiffusionLines,
 	twoRowSierra: twoRowSierra,
-	waveform: waveform
+	waveform: waveform,
+	waveformAlt: waveformAlt
 });
 
 var dithers$1 = Object.values(dither);
@@ -4842,7 +4962,7 @@ var Controls = function Controls(_ref) {
         },
         className: styles$2.slider
       })]
-    }), (settings.style === 'Modulated Diffuse Y' || settings.style === 'Modulated Diffuse X' || settings.style === 'Composite Video' || settings.style === 'Fractalify' || settings.style === 'Joy Plot' || settings.style === 'Rutt-Etra' || settings.style === 'CRT' || settings.style === 'LZ77' || settings.style === 'Reeded Glass') && /*#__PURE__*/jsxRuntimeExports.jsx(ModulatedDiffuseControls, {
+    }), (settings.style === 'Modulated Diffuse Y' || settings.style === 'Modulated Diffuse X' || settings.style === 'Composite Video' || settings.style === 'Fractalify' || settings.style === 'Joy Plot' || settings.style === 'Rutt-Etra' || settings.style === 'CRT' || settings.style === 'LZ77' || settings.style === 'Reeded Glass' || settings.style === 'Waveform' || settings.style === 'Waveform Alt' || settings.style === 'Anaglyph') && /*#__PURE__*/jsxRuntimeExports.jsx(ModulatedDiffuseControls, {
       settings: settings,
       onSettingChange: onSettingChange
     }), /*#__PURE__*/jsxRuntimeExports.jsx("div", {
