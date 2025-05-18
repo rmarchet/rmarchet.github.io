@@ -923,8 +923,10 @@ var DITHER_CATEGORIES = {
   DEFAULT: 'Default',
   ERROR_DIFFUSION: 'Error Diffusion',
   ORDERED_DITHERING: 'Ordered Dithering',
+  HALFTONE: 'Halftone',
   GLITCH_EFFECTS: 'Glitch Effects',
-  ASCII: 'ASCII'
+  ASCII: 'ASCII',
+  COLOR: 'Color'
 };
 var STORAGE_KEY = 'web-dither-image';
 var FILE_NAME_PREFIX = 'ditr-image';
@@ -1187,7 +1189,6 @@ var applyOstromukhov = function applyOstromukhov(image, settings) {
     height = image.height;
   var _settings$noise = settings.noise,
     noise = _settings$noise === void 0 ? 0 : _settings$noise;
-    settings.scale;
   for (var y = 0; y < height; y++) {
     for (var x = 0; x < width; x++) {
       var idx = (y * width + x) * 4;
@@ -1423,7 +1424,6 @@ var applyRandom = function applyRandom(image, settings) {
     height = image.height;
   var _settings$noise = settings.noise,
     noise = _settings$noise === void 0 ? 0 : _settings$noise;
-    settings.scale;
   for (var y = 0; y < height; y++) {
     for (var x = 0; x < width; x++) {
       var idx = (y * width + x) * 4;
@@ -1507,7 +1507,6 @@ var applySierra = function applySierra(image, settings) {
     height = image.height;
   var _settings$noise = settings.noise,
     noise = _settings$noise === void 0 ? 0 : _settings$noise;
-    settings.scale;
   for (var y = 0; y < height; y++) {
     for (var x = 0; x < width; x++) {
       var idx = (y * width + x) * 4;
@@ -1568,109 +1567,6 @@ var sierra = {
   description: 'A dithering algorithm that uses a 3x3 grid to distribute error',
   category: DITHER_CATEGORIES.ERROR_DIFFUSION,
   handle: 'sierra'
-};
-
-var applyHalftone = function applyHalftone(image, settings) {
-  var data = image.data,
-    width = image.width,
-    height = image.height;
-  var _settings$noise = settings.noise,
-    noise = _settings$noise === void 0 ? 0 : _settings$noise;
-  var scale = 1;
-
-  // 2x2 halftone pattern
-  var halftoneMatrix = [[0, 2], [3, 1]];
-  var matrixSize = 2;
-  var threshold = 64;
-  for (var y = 0; y < height; y++) {
-    for (var x = 0; x < width; x++) {
-      var idx = (y * width + x) * 4;
-      var gray = data[idx];
-
-      // Add noise
-      gray += (Math.random() - 0.5) * noise;
-
-      // Apply halftone dithering with scaling
-      var scaledX = Math.floor(x / scale);
-      var scaledY = Math.floor(y / scale);
-      var thresholdValue = halftoneMatrix[scaledY % matrixSize][scaledX % matrixSize] * threshold;
-      var newColor = gray < thresholdValue ? 0 : 255;
-      data[idx] = data[idx + 1] = data[idx + 2] = newColor;
-    }
-  }
-};
-
-var halftone = {
-  apply: applyHalftone,
-  name: 'Halftone',
-  description: 'A dithering algorithm that uses a 2x2 grid to distribute error',
-  category: DITHER_CATEGORIES.ERROR_DIFFUSION,
-  handle: 'halftone'
-};
-
-var applyHalftoneDots = function applyHalftoneDots(imageSettings, ditherSettings) {
-  var width = imageSettings.width,
-    height = imageSettings.height,
-    data = imageSettings.data;
-  var minRadius = 1;
-  var maxRadius = 8;
-  var cellSize = maxRadius * 2; // Distance between dot centers
-
-  // Create a copy of the original data
-  var original = new Uint8ClampedArray(data);
-
-  // Fill image with white
-  for (var i = 0; i < data.length; i += 4) {
-    data[i] = 255;
-    data[i + 1] = 255;
-    data[i + 2] = 255;
-    data[i + 3] = 255;
-  }
-
-  // For each cell in the grid
-  for (var cy = 0; cy < height; cy += cellSize) {
-    for (var cx = 0; cx < width; cx += cellSize) {
-      // Compute average brightness in the cell
-      var sum = 0;
-      var count = 0;
-      for (var y = cy; y < Math.min(cy + cellSize, height); y++) {
-        for (var x = cx; x < Math.min(cx + cellSize, width); x++) {
-          var idx = (y * width + x) * 4;
-          // Use luminosity formula for grayscale
-          var gray = 0.299 * original[idx] + 0.587 * original[idx + 1] + 0.114 * original[idx + 2];
-          sum += gray;
-          count++;
-        }
-      }
-      var avg = sum / count;
-      // Map brightness to dot radius (darker = bigger dot)
-      var radius = minRadius + (maxRadius - minRadius) * (1 - avg / 255);
-      // Draw dot at cell center
-      var centerX = cx + cellSize / 2;
-      var centerY = cy + cellSize / 2;
-      for (var _y = cy; _y < Math.min(cy + cellSize, height); _y++) {
-        for (var _x = cx; _x < Math.min(cx + cellSize, width); _x++) {
-          var dx = _x - centerX;
-          var dy = _y - centerY;
-          if (dx * dx + dy * dy <= radius * radius) {
-            var _idx = (_y * width + _x) * 4;
-            data[_idx] = 0;
-            data[_idx + 1] = 0;
-            data[_idx + 2] = 0;
-            data[_idx + 3] = 255;
-          }
-        }
-      }
-    }
-  }
-};
-
-var halftoneDots = {
-  apply: applyHalftoneDots,
-  name: 'Halftone Dots',
-  description: 'A filter that creates a halftone dots effect',
-  category: DITHER_CATEGORIES.ERROR_DIFFUSION,
-  handle: 'halftone-dots'
 };
 
 var applyStucki = function applyStucki(image, settings) {
@@ -1750,6 +1646,158 @@ var stucki = {
   description: 'A dithering algorithm that uses a 3x3 grid to distribute error',
   category: DITHER_CATEGORIES.ERROR_DIFFUSION,
   handle: 'stucki'
+};
+
+var applyHalftone = function applyHalftone(image, settings) {
+  var data = image.data,
+    width = image.width,
+    height = image.height;
+  var _settings$noise = settings.noise,
+    noise = _settings$noise === void 0 ? 0 : _settings$noise;
+  var scale = 1;
+
+  // 2x2 halftone pattern
+  var halftoneMatrix = [[0, 2], [3, 1]];
+  var matrixSize = 2;
+  var threshold = 64;
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      var idx = (y * width + x) * 4;
+      var gray = data[idx];
+
+      // Add noise
+      gray += (Math.random() - 0.5) * noise;
+
+      // Apply halftone dithering with scaling
+      var scaledX = Math.floor(x / scale);
+      var scaledY = Math.floor(y / scale);
+      var thresholdValue = halftoneMatrix[scaledY % matrixSize][scaledX % matrixSize] * threshold;
+      var newColor = gray < thresholdValue ? 0 : 255;
+      data[idx] = data[idx + 1] = data[idx + 2] = newColor;
+    }
+  }
+};
+
+var halftone = {
+  apply: applyHalftone,
+  name: 'Halftone',
+  description: 'A dithering algorithm that uses a 2x2 grid to distribute error',
+  category: DITHER_CATEGORIES.HALFTONE,
+  handle: 'halftone'
+};
+
+var applyHalftoneDots = function applyHalftoneDots(imageSettings) {
+  var width = imageSettings.width,
+    height = imageSettings.height,
+    data = imageSettings.data;
+  var minRadius = 1;
+  var maxRadius = 8;
+  var cellSize = maxRadius * 2; // Distance between dot centers
+
+  // Create a copy of the original data
+  var original = new Uint8ClampedArray(data);
+
+  // Fill image with white
+  for (var i = 0; i < data.length; i += 4) {
+    data[i] = 255;
+    data[i + 1] = 255;
+    data[i + 2] = 255;
+    data[i + 3] = 255;
+  }
+
+  // For each cell in the grid
+  for (var cy = 0; cy < height; cy += cellSize) {
+    for (var cx = 0; cx < width; cx += cellSize) {
+      // Compute average brightness in the cell
+      var sum = 0;
+      var count = 0;
+      for (var y = cy; y < Math.min(cy + cellSize, height); y++) {
+        for (var x = cx; x < Math.min(cx + cellSize, width); x++) {
+          var idx = (y * width + x) * 4;
+          // Use luminosity formula for grayscale
+          var gray = 0.299 * original[idx] + 0.587 * original[idx + 1] + 0.114 * original[idx + 2];
+          sum += gray;
+          count++;
+        }
+      }
+      var avg = sum / count;
+      // Map brightness to dot radius (darker = bigger dot)
+      var radius = minRadius + (maxRadius - minRadius) * (1 - avg / 255);
+      // Draw dot at cell center
+      var centerX = cx + cellSize / 2;
+      var centerY = cy + cellSize / 2;
+      for (var _y = cy; _y < Math.min(cy + cellSize, height); _y++) {
+        for (var _x = cx; _x < Math.min(cx + cellSize, width); _x++) {
+          var dx = _x - centerX;
+          var dy = _y - centerY;
+          if (dx * dx + dy * dy <= radius * radius) {
+            var _idx = (_y * width + _x) * 4;
+            data[_idx] = 0;
+            data[_idx + 1] = 0;
+            data[_idx + 2] = 0;
+            data[_idx + 3] = 255;
+          }
+        }
+      }
+    }
+  }
+};
+
+var halftoneDots = {
+  apply: applyHalftoneDots,
+  name: 'Halftone Dots',
+  description: 'A filter that creates a halftone dots effect',
+  category: DITHER_CATEGORIES.HALFTONE,
+  handle: 'halftone-dots'
+};
+
+var applyHalftoneLines = function applyHalftoneLines(image, settings) {
+  var width = image.width,
+    height = image.height,
+    data = image.data;
+  var _settings$phase = settings.phase,
+    phase = _settings$phase === void 0 ? 0 : _settings$phase;
+  var amplitude = (settings.amplitude || 0.5) * 8;
+  var frequency = (settings.frequency || 0.005) * 5;
+
+  // Copy original data
+  var original = new Uint8ClampedArray(data);
+
+  // Fill image with white
+  for (var i = 0; i < data.length; i += 4) {
+    data[i] = 255;
+    data[i + 1] = 255;
+    data[i + 2] = 255;
+    data[i + 3] = 255;
+  }
+
+  // For each pixel, determine if it should be part of a line
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      var idx = (y * width + x) * 4;
+      // Get brightness at this pixel
+      var gray = 0.299 * original[idx] + 0.587 * original[idx + 1] + 0.114 * original[idx + 2];
+      // Map brightness to line thickness (darker = thicker)
+      var thickness = 1 + amplitude * (1 - gray / 255);
+      // Diagonal coordinate (45-degree lines)
+      var d = (x + y + phase * 100) * frequency;
+      // If within the thickness, draw black
+      if (d % amplitude < thickness) {
+        data[idx] = 0;
+        data[idx + 1] = 0;
+        data[idx + 2] = 0;
+        data[idx + 3] = 255;
+      }
+    }
+  }
+};
+
+var halftoneLines = {
+  apply: applyHalftoneLines,
+  name: 'Halftone Lines',
+  description: 'Halftone Lines filter with adjustable frequency, phase, and amplitude',
+  category: DITHER_CATEGORIES.HALFTONE,
+  handle: 'halftone-lines'
 };
 
 // 8x8 Bayer matrix for ordered dithering
@@ -1866,6 +1914,78 @@ var bayerMatrix4x4 = {
   description: 'A dithering algorithm that uses a 4x4 grid to distribute error',
   category: DITHER_CATEGORIES.ORDERED_DITHERING,
   handle: 'bayerMatrix4x4'
+};
+
+var bayer8x8 = [[0, 32, 8, 40, 2, 34, 10, 42], [48, 16, 56, 24, 50, 18, 58, 26], [12, 44, 4, 36, 14, 46, 6, 38], [60, 28, 52, 20, 62, 30, 54, 22], [3, 35, 11, 43, 1, 33, 9, 41], [51, 19, 59, 27, 49, 17, 57, 25], [15, 47, 7, 39, 13, 45, 5, 37], [63, 31, 55, 23, 61, 29, 53, 21]];
+var applyBayerMatrix8x8 = function applyBayerMatrix8x8(image, settings) {
+  var data = image.data,
+    width = image.width,
+    height = image.height;
+  var _settings$noise = settings.noise,
+    noise = _settings$noise === void 0 ? 0 : _settings$noise;
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      var idx = (y * width + x) * 4;
+      // Convert to grayscale
+      var gray = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+      // Add noise if needed
+      if (noise > 0) {
+        gray += (Math.random() - 0.5) * noise;
+      }
+      // Normalize gray to [0, 1]
+      var normGray = gray / 255;
+      // Get Bayer threshold for this pixel, normalized to [0, 1]
+      var threshold = bayer8x8[y % 8][x % 8] / 64;
+      // Dither
+      var value = normGray > threshold ? 255 : 0;
+      data[idx] = data[idx + 1] = data[idx + 2] = value;
+      data[idx + 3] = 255;
+    }
+  }
+};
+
+var bayerMatrix8x8 = {
+  apply: applyBayerMatrix8x8,
+  name: 'Bayer Matrix 8x8',
+  description: 'A dithering algorithm that uses a 8x8 grid to distribute error',
+  category: DITHER_CATEGORIES.ORDERED_DITHERING,
+  handle: 'bayerMatrix8x8'
+};
+
+var bayer16x16 = [[0, 128, 32, 160, 8, 136, 40, 168, 2, 130, 34, 162, 10, 138, 42, 170], [192, 64, 224, 96, 200, 72, 232, 104, 194, 66, 226, 98, 202, 74, 234, 106], [48, 176, 16, 144, 56, 184, 24, 152, 50, 178, 18, 146, 58, 186, 26, 154], [240, 112, 208, 80, 248, 120, 216, 88, 242, 114, 210, 82, 250, 122, 218, 90], [12, 140, 44, 172, 4, 132, 36, 164, 14, 142, 46, 174, 6, 134, 38, 166], [204, 76, 236, 108, 196, 68, 228, 100, 206, 78, 238, 110, 198, 70, 230, 102], [60, 188, 28, 156, 52, 180, 20, 148, 62, 190, 30, 158, 54, 182, 22, 150], [252, 124, 220, 92, 244, 116, 212, 84, 254, 126, 222, 94, 246, 118, 214, 86], [3, 131, 35, 163, 11, 139, 43, 171, 1, 129, 33, 161, 9, 137, 41, 169], [195, 67, 227, 99, 203, 75, 235, 107, 193, 65, 225, 97, 201, 73, 233, 105], [51, 179, 19, 147, 59, 187, 27, 155, 49, 177, 17, 145, 57, 185, 25, 153], [243, 115, 211, 83, 251, 123, 219, 91, 241, 113, 209, 81, 249, 121, 217, 89], [15, 143, 47, 175, 7, 135, 39, 167, 13, 141, 45, 173, 5, 133, 37, 165], [207, 79, 239, 111, 199, 71, 231, 103, 205, 77, 237, 109, 197, 69, 229, 101], [63, 191, 31, 159, 55, 183, 23, 151, 61, 189, 29, 157, 53, 181, 21, 149], [255, 127, 223, 95, 247, 119, 215, 87, 253, 125, 221, 93, 245, 117, 213, 85]];
+var applyBayerMatrix16x16 = function applyBayerMatrix16x16(image, settings) {
+  var data = image.data,
+    width = image.width,
+    height = image.height;
+  var _settings$noise = settings.noise,
+    noise = _settings$noise === void 0 ? 0 : _settings$noise;
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      var idx = (y * width + x) * 4;
+      // Convert to grayscale
+      var gray = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+      // Add noise if needed
+      if (noise > 0) {
+        gray += (Math.random() - 0.5) * noise;
+      }
+      // Normalize gray to [0, 1]
+      var normGray = gray / 255;
+      // Get Bayer threshold for this pixel, normalized to [0, 1]
+      var threshold = bayer16x16[y % 16][x % 16] / 256;
+      // Dither
+      var value = normGray > threshold ? 255 : 0;
+      data[idx] = data[idx + 1] = data[idx + 2] = value;
+      data[idx + 3] = 255;
+    }
+  }
+};
+
+var bayerMatrix16x16 = {
+  apply: applyBayerMatrix16x16,
+  name: 'Bayer Matrix 16x16',
+  description: 'A dithering algorithm that uses a 16x16 grid to distribute error',
+  category: DITHER_CATEGORIES.ORDERED_DITHERING,
+  handle: 'bayerMatrix16x16'
 };
 
 // 8x8 Bayer matrix with void pattern
@@ -3373,7 +3493,7 @@ var stukiDiffusionLines = {
   handle: 'stukiDiffusionLines'
 };
 
-var applyFractalify = function applyFractalify(image, settings) {
+var applyFractalify = function applyFractalify(image) {
   var width = image.width,
     height = image.height,
     data = image.data;
@@ -4293,6 +4413,263 @@ var alphanumeric = {
   category: DITHER_CATEGORIES.ASCII
 };
 
+var GREEN_DOMINANCE_SOFTNESS = 96; // Softer transition, broader selection
+var FOLIAGE_RED = function FOLIAGE_RED(g, b) {
+  return Math.min(255, g * 1.1 + b * 1.0);
+}; // Less intense magenta
+var FOLIAGE_BLUE = function FOLIAGE_BLUE(b, g) {
+  return Math.min(255, b * 1.0 + g * 0.2);
+}; // Less intense magenta
+var FOLIAGE_GREEN = 0; // Suppress green for magenta
+
+function rgbToHsv(r, g, b) {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  var max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
+  var h = 0;
+  var d = max - min;
+  var s = max === 0 ? 0 : d / max;
+  var v = max;
+  if (max !== min) {
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+  return [h, s, v];
+}
+function hsvToRgb(h, s, v) {
+  var r = 0,
+    g = 0,
+    b = 0;
+  var i = Math.floor(h * 6);
+  var f = h * 6 - i;
+  var p = v * (1 - s);
+  var q = v * (1 - f * s);
+  var t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+    case 0:
+      r = v;
+      g = t;
+      b = p;
+      break;
+    case 1:
+      r = q;
+      g = v;
+      b = p;
+      break;
+    case 2:
+      r = p;
+      g = v;
+      b = t;
+      break;
+    case 3:
+      r = p;
+      g = q;
+      b = v;
+      break;
+    case 4:
+      r = t;
+      g = p;
+      b = v;
+      break;
+    case 5:
+      r = v;
+      g = p;
+      b = q;
+      break;
+  }
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+}
+var applyInfrared = function applyInfrared(image) {
+  var width = image.width,
+    height = image.height,
+    data = image.data;
+  var original = new Uint8ClampedArray(data);
+  for (var i = 0; i < width * height; i++) {
+    var idx = i * 4;
+    var r = original[idx];
+    var g = original[idx + 1];
+    var b = original[idx + 2];
+
+    // Invert and keep only red channel
+    var invR = 255 - r;
+    var inv = [invR, 0, 0];
+
+    // Convert both to HSV
+    var _rgbToHsv = rgbToHsv(r, g, b),
+      _rgbToHsv2 = _slicedToArray$1(_rgbToHsv, 3),
+      h1 = _rgbToHsv2[0],
+      s1 = _rgbToHsv2[1],
+      v1 = _rgbToHsv2[2];
+    var _rgbToHsv3 = rgbToHsv(inv[0], inv[1], inv[2]),
+      _rgbToHsv4 = _slicedToArray$1(_rgbToHsv3, 1),
+      h2 = _rgbToHsv4[0];
+
+    // Blend hue channels
+    var hue = 0.9 * h2 + 0.9 * h1;
+    var s = s1;
+    var v = v1;
+
+    // Convert back to RGB
+    var _hsvToRgb = hsvToRgb(hue % 1, s, v),
+      _hsvToRgb2 = _slicedToArray$1(_hsvToRgb, 3),
+      nr = _hsvToRgb2[0],
+      ng = _hsvToRgb2[1],
+      nb = _hsvToRgb2[2];
+
+    // Soft foliage mask: how much green dominates
+    var avgRB = (r + b) / 2;
+    var greenDominance = Math.max(0, (g - avgRB) / GREEN_DOMINANCE_SOFTNESS);
+
+    // Blend between HSV effect and magenta foliage based on green dominance
+    data[idx] = nr * (1 - greenDominance) + FOLIAGE_RED(g, b) * greenDominance;
+    data[idx + 1] = ng * (1 - greenDominance) + FOLIAGE_GREEN * greenDominance;
+    data[idx + 2] = nb * (1 - greenDominance) + FOLIAGE_BLUE(b, g) * greenDominance;
+    // Alpha stays the same
+  }
+};
+
+var infrared = {
+  apply: applyInfrared,
+  name: 'Infrared',
+  handle: 'infrared',
+  description: 'Simulate an infrared camera filter',
+  category: DITHER_CATEGORIES.COLOR
+};
+
+// Helper: linear interpolation between two colors
+function lerpColor(a, b, t) {
+  return [Math.round(a[0] + (b[0] - a[0]) * t), Math.round(a[1] + (b[1] - a[1]) * t), Math.round(a[2] + (b[2] - a[2]) * t)];
+}
+
+// Helper: interpolate between two palettes
+function lerpPalette(p1, p2, t) {
+  return [lerpColor(p1[0], p2[0], t), lerpColor(p1[1], p2[1], t)];
+}
+
+// Neon palettes
+var PALETTES = [[[225, 0, 152], [255, 255, 0]],
+// Magenta/Yellow
+[[0, 255, 255], [255, 255, 0]],
+// Cyan/Yellow
+[[0, 255, 128], [225, 0, 152]],
+// Green/Magenta
+[[0, 128, 255], [255, 128, 0]] // Blue/Orange
+];
+var applyNeonNegative = function applyNeonNegative(image, settings) {
+  var width = image.width,
+    height = image.height,
+    data = image.data;
+  var amplitude = settings.amplitude;
+  var phase = settings.phase;
+  var frequency = settings.frequency * 4;
+  var noise = settings.noise;
+
+  // Interpolate between palettes for base and overlay
+  var palettePos = frequency * (PALETTES.length - 1);
+  var paletteIdx = Math.floor(palettePos);
+  var paletteT = palettePos - paletteIdx;
+  var paletteA = PALETTES[paletteIdx];
+  var paletteB = PALETTES[Math.min(paletteIdx + 1, PALETTES.length - 1)];
+  var _lerpPalette = lerpPalette(paletteA, paletteB, paletteT),
+    _lerpPalette2 = _slicedToArray$1(_lerpPalette, 2),
+    colorA1 = _lerpPalette2[0],
+    colorB1 = _lerpPalette2[1];
+
+  // For overlay, use the next palette (or wrap around)
+  var overlayIdx = (paletteIdx + 1) % PALETTES.length;
+  var _PALETTES$overlayIdx = _slicedToArray$1(PALETTES[overlayIdx], 2),
+    colorA2 = _PALETTES$overlayIdx[0],
+    colorB2 = _PALETTES$overlayIdx[1];
+
+  // Store the original image data for overlays
+  var original = new Uint8ClampedArray(data);
+
+  // Store the original duotone
+  var duotone = new Uint8ClampedArray(data.length);
+
+  // First pass: duotone for the base image
+  for (var i = 0; i < width * height; i++) {
+    var idx = i * 4;
+    // Invert
+    var r = 255 - original[idx];
+    var g = 255 - original[idx + 1];
+    var b = 255 - original[idx + 2];
+    // Grayscale (brightness)
+    var gray = 0.299 * r + 0.587 * g + 0.114 * b;
+    // Map to duotone with noise
+    var t = Math.min(1, Math.max(0, gray / 255 + (Math.random() - 0.5) * noise / 100));
+    var _lerpColor = lerpColor(colorA1, colorB1, t),
+      _lerpColor2 = _slicedToArray$1(_lerpColor, 3),
+      nr = _lerpColor2[0],
+      ng = _lerpColor2[1],
+      nb = _lerpColor2[2];
+    duotone[idx] = nr;
+    duotone[idx + 1] = ng;
+    duotone[idx + 2] = nb;
+    duotone[idx + 3] = 255;
+  }
+
+  // Second pass: overlay a mirrored, scaled, recolored duplicate
+  var scale = amplitude + 1.18;
+  var offsetX = -Math.round(width * phase);
+  var offsetY = -Math.round(height * phase);
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      var _idx = (y * width + x) * 4;
+      // Start with the base duotone
+      var _r = duotone[_idx];
+      var _g = duotone[_idx + 1];
+      var _b = duotone[_idx + 2];
+
+      // Inverse mapping: for each output pixel, find the corresponding source pixel in the scaled, shifted duplicate
+      var sx = width - 1 - Math.round((x - offsetX) / scale);
+      var sy = Math.round((y - offsetY) / scale);
+      if (sx >= 0 && sx < width && sy >= 0 && sy < height) {
+        var sidx = (sy * width + sx) * 4;
+        // Invert and duotone with the overlay palette, using the original image
+        var sr = 255 - original[sidx];
+        var sg = 255 - original[sidx + 1];
+        var sb = 255 - original[sidx + 2];
+        var sgray = 0.299 * sr + 0.587 * sg + 0.114 * sb;
+        var _t = Math.min(1, Math.max(0, sgray / 255 + (Math.random() - 0.5) * noise / 100));
+        var _lerpColor3 = lerpColor(colorA2, colorB2, _t),
+          _lerpColor4 = _slicedToArray$1(_lerpColor3, 3),
+          dr = _lerpColor4[0],
+          dg = _lerpColor4[1],
+          db = _lerpColor4[2];
+        // Soft blend: alpha blend (60% base, 40% duplicate)
+        _r = Math.round(_r * 0.6 + dr * 0.4);
+        _g = Math.round(_g * 0.6 + dg * 0.4);
+        _b = Math.round(_b * 0.6 + db * 0.4);
+      }
+      data[_idx] = _r;
+      data[_idx + 1] = _g;
+      data[_idx + 2] = _b;
+      data[_idx + 3] = 255;
+    }
+  }
+};
+
+var neonNegative = {
+  apply: applyNeonNegative,
+  name: 'Neon Negative',
+  description: 'Neon Negative filter',
+  category: DITHER_CATEGORIES.COLOR,
+  handle: 'neon-negative'
+};
+
 // Error Diffusion
 
 var dither = /*#__PURE__*/Object.freeze({
@@ -4302,8 +4679,10 @@ var dither = /*#__PURE__*/Object.freeze({
 	atkinson: atkinson,
 	atkinsonVHS: atkinsonVHS,
 	bayer: bayer,
+	bayerMatrix16x16: bayerMatrix16x16,
 	bayerMatrix2x2: bayerMatrix2x2,
 	bayerMatrix4x4: bayerMatrix4x4,
+	bayerMatrix8x8: bayerMatrix8x8,
 	bayerOrdered: bayerOrdered,
 	bayerVoid: bayerVoid,
 	bitTone: bitTone,
@@ -4317,6 +4696,8 @@ var dither = /*#__PURE__*/Object.freeze({
 	glitch: glitch,
 	halftone: halftone,
 	halftoneDots: halftoneDots,
+	halftoneLines: halftoneLines,
+	infrared: infrared,
 	jarvisJudiceNinke: jarvisJudiceNinke,
 	joyPlot: joyPlot,
 	jpegGlitch: jpegGlitch,
@@ -4325,6 +4706,7 @@ var dither = /*#__PURE__*/Object.freeze({
 	modulatedDiffuseX: modulatedDiffuseX,
 	modulatedDiffuseY: modulatedDiffuseY,
 	mosaic: mosaic,
+	neonNegative: neonNegative,
 	ordered: ordered,
 	ostromukhov: ostromukhov,
 	random: random,
@@ -4344,11 +4726,7 @@ var dither = /*#__PURE__*/Object.freeze({
 
 var dithers$1 = Object.values(dither);
 var runDither = function runDither(image, settings) {
-  image.data;
-    image.width;
-    image.height;
   var style = settings.style;
-    settings.noise;
   var dither = dithers$1.find(function (d) {
     return d.name === style;
   });
@@ -11206,12 +11584,16 @@ var StateManagedSelect$1 = StateManagedSelect;
 var dithers = Object.values(dither);
 
 // Define the dither styles as a const array
-var DITHER_OPTIONS = _defineProperty$1(_defineProperty$1(_defineProperty$1(_defineProperty$1(_defineProperty$1({}, DITHER_CATEGORIES.DEFAULT, ['None']), DITHER_CATEGORIES.ERROR_DIFFUSION, dithers.filter(function (d) {
+var DITHER_OPTIONS = _defineProperty$1(_defineProperty$1(_defineProperty$1(_defineProperty$1(_defineProperty$1(_defineProperty$1(_defineProperty$1({}, DITHER_CATEGORIES.DEFAULT, ['None']), DITHER_CATEGORIES.ERROR_DIFFUSION, dithers.filter(function (d) {
   return d.category === DITHER_CATEGORIES.ERROR_DIFFUSION;
 }).map(function (d) {
   return d.name;
 })), DITHER_CATEGORIES.ORDERED_DITHERING, dithers.filter(function (d) {
   return d.category === DITHER_CATEGORIES.ORDERED_DITHERING;
+}).map(function (d) {
+  return d.name;
+})), DITHER_CATEGORIES.HALFTONE, dithers.filter(function (d) {
+  return d.category === DITHER_CATEGORIES.HALFTONE;
 }).map(function (d) {
   return d.name;
 })), DITHER_CATEGORIES.GLITCH_EFFECTS, dithers.filter(function (d) {
@@ -11220,6 +11602,10 @@ var DITHER_OPTIONS = _defineProperty$1(_defineProperty$1(_defineProperty$1(_defi
   return d.name;
 })), DITHER_CATEGORIES.ASCII, dithers.filter(function (d) {
   return d.category === DITHER_CATEGORIES.ASCII;
+}).map(function (d) {
+  return d.name;
+})), DITHER_CATEGORIES.COLOR, dithers.filter(function (d) {
+  return d.category === DITHER_CATEGORIES.COLOR;
 }).map(function (d) {
   return d.name;
 }));
@@ -11430,15 +11816,20 @@ var ModulatedDiffuseControls = function ModulatedDiffuseControls(_ref) {
   });
 };
 
+var ACCENT_COLOR = 'var(--accent-color)';
 var reactSelectStyles = {
   container: function container(styles) {
     return _objectSpread2$1(_objectSpread2$1({}, styles), {}, {
       width: '100%'
     });
   },
-  control: function control(styles) {
+  control: function control(styles, state) {
     return _objectSpread2$1(_objectSpread2$1({}, styles), {}, {
       border: 'none',
+      borderColor: state.isFocused ? ACCENT_COLOR : styles.borderColor,
+      boxShadow: 'none',
+      outline: '4px solid var(--accent-color)',
+      outlineOffset: '-4px',
       borderRadius: '0',
       padding: '0.5rem 0.5rem',
       backgroundColor: 'transparent',
@@ -11448,6 +11839,47 @@ var reactSelectStyles = {
   indicatorSeparator: function indicatorSeparator(styles) {
     return _objectSpread2$1(_objectSpread2$1({}, styles), {}, {
       display: 'none'
+    });
+  },
+  group: function group(styles) {
+    return _objectSpread2$1(_objectSpread2$1({}, styles), {}, {
+      paddingBottom: '0',
+      marginBottom: '0',
+      marginTop: '0'
+    });
+  },
+  groupHeading: function groupHeading(styles) {
+    return _objectSpread2$1(_objectSpread2$1({}, styles), {}, {
+      backgroundColor: '#eee',
+      margin: '0',
+      padding: '0.3rem 0.5rem',
+      fontWeight: 'bold'
+    });
+  },
+  menu: function menu(styles) {
+    return _objectSpread2$1(_objectSpread2$1({}, styles), {}, {
+      height: '100%',
+      minHeight: '700px',
+      maxHeight: '100%',
+      marginTop: '2px',
+      borderRadius: '0',
+      zIndex: 100
+    });
+  },
+  menuList: function menuList(styles) {
+    return _objectSpread2$1(_objectSpread2$1({}, styles), {}, {
+      padding: '0',
+      minHeight: '100%',
+      backgroundColor: 'white'
+    });
+  },
+  option: function option(styles, state) {
+    return _objectSpread2$1(_objectSpread2$1({}, styles), {}, {
+      padding: '0.3rem 0.5rem',
+      backgroundColor: state.isSelected ? ACCENT_COLOR : state.isFocused ? "".concat(ACCENT_COLOR) // Slightly transparent on hover
+      : undefined,
+      color: state.isSelected ? 'black' : 'inherit',
+      cursor: 'pointer'
     });
   }
 };
@@ -11602,7 +12034,7 @@ var Controls = function Controls(_ref) {
         },
         className: styles$2.slider
       })]
-    }), (settings.style === 'Modulated Diffuse Y' || settings.style === 'Modulated Diffuse X' || settings.style === 'Composite Video' || settings.style === 'Fractalify' || settings.style === 'Joy Plot' || settings.style === 'Rutt-Etra' || settings.style === 'CRT' || settings.style === 'LZ77' || settings.style === 'Reeded Glass' || settings.style === 'Waveform' || settings.style === 'Waveform Alt' || settings.style === 'Anaglyph') && /*#__PURE__*/jsxRuntimeExports.jsx(ModulatedDiffuseControls, {
+    }), (settings.style === 'Modulated Diffuse Y' || settings.style === 'Modulated Diffuse X' || settings.style === 'Composite Video' || settings.style === 'Fractalify' || settings.style === 'Joy Plot' || settings.style === 'Rutt-Etra' || settings.style === 'CRT' || settings.style === 'LZ77' || settings.style === 'Reeded Glass' || settings.style === 'Waveform' || settings.style === 'Waveform Alt' || settings.style === 'Anaglyph' || settings.style === 'Halftone Lines' || settings.style === 'Neon Negative') && /*#__PURE__*/jsxRuntimeExports.jsx(ModulatedDiffuseControls, {
       settings: settings,
       onSettingChange: onSettingChange
     }), /*#__PURE__*/jsxRuntimeExports.jsx("div", {
