@@ -1800,6 +1800,83 @@ var halftoneLines = {
   handle: 'halftone-lines'
 };
 
+var applyHalftoneSquares = function applyHalftoneSquares(image, settings) {
+  var width = image.width,
+    height = image.height,
+    data = image.data;
+  var amplitude = settings.amplitude || 1;
+
+  // Block size: amplitude controls the size
+  var minBlock = 1;
+  var maxBlock = 8;
+  var blockSize = Math.round(minBlock + (maxBlock - minBlock) * (1 - amplitude / 10));
+  var minW = Math.max(2, Math.round(blockSize * 0.25));
+  var minH = minW;
+  var maxW = blockSize;
+  var maxH = blockSize;
+  var original = new Uint8ClampedArray(data);
+
+  // Fill image with black
+  for (var i = 0; i < data.length; i += 4) {
+    data[i] = 0;
+    data[i + 1] = 0;
+    data[i + 2] = 0;
+    data[i + 3] = 255;
+  }
+  for (var cy = 0; cy < height; cy += blockSize) {
+    for (var cx = 0; cx < width; cx += blockSize) {
+      // Compute average brightness in the cell
+      var sum = 0;
+      var count = 0;
+      for (var y = cy; y < Math.min(cy + blockSize, height); y++) {
+        for (var x = cx; x < Math.min(cx + blockSize, width); x++) {
+          var idx = (y * width + x) * 4;
+          var gray = 0.299 * original[idx] + 0.587 * original[idx + 1] + 0.114 * original[idx + 2];
+          sum += gray;
+          count++;
+        }
+      }
+      var avg = sum / count;
+      var norm = avg / 255;
+      var rectW = minW;
+      var rectH = minH;
+      if (norm > 0.5) {
+        // For higher brightness, width grows, height is max
+        rectW = minW + (maxW - minW) * ((norm - 0.5) / 0.5);
+        rectH = maxH;
+      } else if (norm > 0.05) {
+        // For mid brightness, width is min, height grows
+        rectW = minW;
+        rectH = minH + (maxH - minH) * (norm / 0.5);
+      } else {
+        // Very dark: no rectangle (leave block black)
+        continue;
+      }
+
+      // Center the rectangle in the cell
+      var startX = Math.round(cx + (blockSize - rectW) / 2);
+      var startY = Math.round(cy + (blockSize - rectH) / 2);
+      for (var _y = startY; _y < startY + rectH && _y < height; _y++) {
+        for (var _x = startX; _x < startX + rectW && _x < width; _x++) {
+          var _idx = (_y * width + _x) * 4;
+          data[_idx] = 255;
+          data[_idx + 1] = 255;
+          data[_idx + 2] = 255;
+          data[_idx + 3] = 255;
+        }
+      }
+    }
+  }
+};
+
+var halftoneSquares = {
+  apply: applyHalftoneSquares,
+  name: "Halftone Squares",
+  description: "Apply a halftone pattern to the image",
+  category: DITHER_CATEGORIES.HALFTONE,
+  handle: "halftone-squares"
+};
+
 // 8x8 Bayer matrix for ordered dithering
 var BAYER_MATRIX$1 = [[0, 48, 12, 60, 3, 51, 15, 63], [32, 16, 44, 28, 35, 19, 47, 31], [8, 56, 4, 52, 11, 59, 7, 55], [40, 24, 36, 20, 43, 27, 39, 23], [2, 50, 14, 62, 1, 49, 13, 61], [34, 18, 46, 30, 33, 17, 45, 29], [10, 58, 6, 54, 9, 57, 5, 53], [42, 26, 38, 22, 41, 25, 37, 21]];
 var applyBayerOrdered = function applyBayerOrdered(image, settings) {
@@ -4559,7 +4636,7 @@ function lerpPalette(p1, p2, t) {
 }
 
 // Neon palettes
-var PALETTES = [[[225, 0, 152], [255, 255, 0]],
+var PALETTES$1 = [[[225, 0, 152], [255, 255, 0]],
 // Magenta/Yellow
 [[0, 255, 255], [255, 255, 0]],
 // Cyan/Yellow
@@ -4577,19 +4654,19 @@ var applyNeonNegative = function applyNeonNegative(image, settings) {
   var noise = settings.noise;
 
   // Interpolate between palettes for base and overlay
-  var palettePos = frequency * (PALETTES.length - 1);
+  var palettePos = frequency * (PALETTES$1.length - 1);
   var paletteIdx = Math.floor(palettePos);
   var paletteT = palettePos - paletteIdx;
-  var paletteA = PALETTES[paletteIdx];
-  var paletteB = PALETTES[Math.min(paletteIdx + 1, PALETTES.length - 1)];
+  var paletteA = PALETTES$1[paletteIdx];
+  var paletteB = PALETTES$1[Math.min(paletteIdx + 1, PALETTES$1.length - 1)];
   var _lerpPalette = lerpPalette(paletteA, paletteB, paletteT),
     _lerpPalette2 = _slicedToArray$1(_lerpPalette, 2),
     colorA1 = _lerpPalette2[0],
     colorB1 = _lerpPalette2[1];
 
   // For overlay, use the next palette (or wrap around)
-  var overlayIdx = (paletteIdx + 1) % PALETTES.length;
-  var _PALETTES$overlayIdx = _slicedToArray$1(PALETTES[overlayIdx], 2),
+  var overlayIdx = (paletteIdx + 1) % PALETTES$1.length;
+  var _PALETTES$overlayIdx = _slicedToArray$1(PALETTES$1[overlayIdx], 2),
     colorA2 = _PALETTES$overlayIdx[0],
     colorB2 = _PALETTES$overlayIdx[1];
 
@@ -4670,6 +4747,114 @@ var neonNegative = {
   handle: 'neon-negative'
 };
 
+// Example palettes (you can add more or make them configurable)
+var PALETTES = [
+// Obama Hope style
+[[29, 54, 93],
+// dark blue
+[217, 58, 41],
+// red
+[235, 224, 170],
+// cream
+[112, 150, 158] // light blue
+],
+// Pop art yellow/blue
+[[44, 27, 87],
+// purple
+[255, 255, 102],
+// yellow
+[66, 135, 245],
+// blue
+[255, 255, 255] // white
+],
+// Retro green/orange
+[[34, 40, 49],
+// dark
+[255, 87, 34],
+// orange
+[139, 195, 74],
+// green
+[255, 255, 255] // white
+],
+// Vaporwave
+[[255, 0, 110],
+// pink
+[0, 255, 255],
+// cyan
+[255, 255, 255],
+// white
+[32, 0, 44] // deep purple
+],
+// Classic comic
+[[0, 0, 0],
+// black
+[255, 221, 51],
+// yellow
+[51, 102, 204],
+// blue
+[255, 255, 255] // white
+]];
+var applyPosterize = function applyPosterize(image, settings) {
+  var width = image.width,
+    height = image.height,
+    data = image.data;
+  var amplitude = Math.max(2, Math.round(settings.amplitude || 4)); // number of bands/colors
+  var frequency = settings.frequency || 0;
+  var noise = settings.noise || 0;
+  var phase = settings.phase || 0;
+
+  // Palette selection/blending logic
+  var paletteCount = PALETTES.length;
+  // Clamp phase to [0, paletteCount-1]
+  var clampedPhase = Math.max(0, Math.min(paletteCount - 1, phase));
+  var paletteIdxA = Math.floor(clampedPhase);
+  var paletteIdxB = Math.min(paletteCount - 1, paletteIdxA + 1);
+  var t = clampedPhase - paletteIdxA;
+  var paletteA = PALETTES[paletteIdxA];
+  var paletteB = PALETTES[paletteIdxB];
+  // Use the smaller of the two palettes for band count
+  var numBands = Math.min(amplitude, paletteA.length, paletteB.length);
+
+  // Helper to blend two colors
+  function blendColor(a, b, t) {
+    return [Math.round(a[0] * (1 - t) + b[0] * t), Math.round(a[1] * (1 - t) + b[1] * t), Math.round(a[2] * (1 - t) + b[2] * t)];
+  }
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      var idx = (y * width + x) * 4;
+
+      // Grayscale (brightness)
+      var gray = 0.299 * data[idx] + 0.587 * data[idx + 1] + 0.114 * data[idx + 2];
+      // Add noise
+      gray += (Math.random() - 0.5) * noise;
+
+      // Clamp
+      gray = Math.max(0, Math.min(255, gray));
+
+      // Normalize gray to [0, 1]
+      var norm = gray / 255;
+      // Apply sharpness: higher frequency = sharper
+      var sharpness = Math.max(1, frequency * 10); // adjust scaling as needed
+      norm = Math.pow(norm, sharpness);
+      var band = Math.floor(norm * numBands);
+      // Blend between palettes for this band
+      var color = blendColor(paletteA[Math.min(band, numBands - 1)], paletteB[Math.min(band, numBands - 1)], t);
+      data[idx] = color[0];
+      data[idx + 1] = color[1];
+      data[idx + 2] = color[2];
+      // Alpha stays the same
+    }
+  }
+};
+
+var posterize = {
+  name: "Posterize",
+  category: DITHER_CATEGORIES.COLOR,
+  apply: applyPosterize,
+  description: "Posterize the image",
+  handle: 'posterize'
+};
+
 // Error Diffusion
 
 var dither = /*#__PURE__*/Object.freeze({
@@ -4697,6 +4882,7 @@ var dither = /*#__PURE__*/Object.freeze({
 	halftone: halftone,
 	halftoneDots: halftoneDots,
 	halftoneLines: halftoneLines,
+	halftoneSquares: halftoneSquares,
 	infrared: infrared,
 	jarvisJudiceNinke: jarvisJudiceNinke,
 	joyPlot: joyPlot,
@@ -4709,6 +4895,7 @@ var dither = /*#__PURE__*/Object.freeze({
 	neonNegative: neonNegative,
 	ordered: ordered,
 	ostromukhov: ostromukhov,
+	posterize: posterize,
 	random: random,
 	randomOrdered: randomOrdered,
 	reededGlass: reededGlass,
@@ -12034,7 +12221,7 @@ var Controls = function Controls(_ref) {
         },
         className: styles$2.slider
       })]
-    }), (settings.style === 'Modulated Diffuse Y' || settings.style === 'Modulated Diffuse X' || settings.style === 'Composite Video' || settings.style === 'Fractalify' || settings.style === 'Joy Plot' || settings.style === 'Rutt-Etra' || settings.style === 'CRT' || settings.style === 'LZ77' || settings.style === 'Reeded Glass' || settings.style === 'Waveform' || settings.style === 'Waveform Alt' || settings.style === 'Anaglyph' || settings.style === 'Halftone Lines' || settings.style === 'Neon Negative') && /*#__PURE__*/jsxRuntimeExports.jsx(ModulatedDiffuseControls, {
+    }), (settings.style === 'Modulated Diffuse Y' || settings.style === 'Modulated Diffuse X' || settings.style === 'Composite Video' || settings.style === 'Fractalify' || settings.style === 'Joy Plot' || settings.style === 'Rutt-Etra' || settings.style === 'CRT' || settings.style === 'LZ77' || settings.style === 'Reeded Glass' || settings.style === 'Waveform' || settings.style === 'Waveform Alt' || settings.style === 'Anaglyph' || settings.style === 'Halftone Lines' || settings.style === 'Neon Negative' || settings.style === 'Posterize') && /*#__PURE__*/jsxRuntimeExports.jsx(ModulatedDiffuseControls, {
       settings: settings,
       onSettingChange: onSettingChange
     }), /*#__PURE__*/jsxRuntimeExports.jsx("div", {
