@@ -2496,6 +2496,77 @@ var hslToRgb = function hslToRgb(h, s, l) {
   return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
 };
 
+// HSV conversion utilities (copied from infrared)
+var rgbToHsv = function rgbToHsv(r, g, b) {
+  r /= 255;
+  g /= 255;
+  b /= 255;
+  var max = Math.max(r, g, b),
+    min = Math.min(r, g, b);
+  var h = 0;
+  var d = max - min;
+  var s = max === 0 ? 0 : d / max;
+  var v = max;
+  if (max !== min) {
+    switch (max) {
+      case r:
+        h = (g - b) / d + (g < b ? 6 : 0);
+        break;
+      case g:
+        h = (b - r) / d + 2;
+        break;
+      case b:
+        h = (r - g) / d + 4;
+        break;
+    }
+    h /= 6;
+  }
+  return [h, s, v];
+};
+var hsvToRgb = function hsvToRgb(h, s, v) {
+  var r = 0,
+    g = 0,
+    b = 0;
+  var i = Math.floor(h * 6);
+  var f = h * 6 - i;
+  var p = v * (1 - s);
+  var q = v * (1 - f * s);
+  var t = v * (1 - (1 - f) * s);
+  switch (i % 6) {
+    case 0:
+      r = v;
+      g = t;
+      b = p;
+      break;
+    case 1:
+      r = q;
+      g = v;
+      b = p;
+      break;
+    case 2:
+      r = p;
+      g = v;
+      b = t;
+      break;
+    case 3:
+      r = p;
+      g = q;
+      b = v;
+      break;
+    case 4:
+      r = t;
+      g = p;
+      b = v;
+      break;
+    case 5:
+      r = v;
+      g = p;
+      b = q;
+      break;
+  }
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
+};
+
 var applyCrt = function applyCrt(image, settings) {
   var _settings$amplitude, _settings$amplitude2, _settings$noise, _settings$phase, _settings$noise2;
   var width = image.width,
@@ -4499,75 +4570,6 @@ var FOLIAGE_BLUE = function FOLIAGE_BLUE(b, g) {
 }; // Less intense magenta
 var FOLIAGE_GREEN = 0; // Suppress green for magenta
 
-function rgbToHsv(r, g, b) {
-  r /= 255;
-  g /= 255;
-  b /= 255;
-  var max = Math.max(r, g, b),
-    min = Math.min(r, g, b);
-  var h = 0;
-  var d = max - min;
-  var s = max === 0 ? 0 : d / max;
-  var v = max;
-  if (max !== min) {
-    switch (max) {
-      case r:
-        h = (g - b) / d + (g < b ? 6 : 0);
-        break;
-      case g:
-        h = (b - r) / d + 2;
-        break;
-      case b:
-        h = (r - g) / d + 4;
-        break;
-    }
-    h /= 6;
-  }
-  return [h, s, v];
-}
-function hsvToRgb(h, s, v) {
-  var r = 0,
-    g = 0,
-    b = 0;
-  var i = Math.floor(h * 6);
-  var f = h * 6 - i;
-  var p = v * (1 - s);
-  var q = v * (1 - f * s);
-  var t = v * (1 - (1 - f) * s);
-  switch (i % 6) {
-    case 0:
-      r = v;
-      g = t;
-      b = p;
-      break;
-    case 1:
-      r = q;
-      g = v;
-      b = p;
-      break;
-    case 2:
-      r = p;
-      g = v;
-      b = t;
-      break;
-    case 3:
-      r = p;
-      g = q;
-      b = v;
-      break;
-    case 4:
-      r = t;
-      g = p;
-      b = v;
-      break;
-    case 5:
-      r = v;
-      g = p;
-      b = q;
-      break;
-  }
-  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)];
-}
 var applyInfrared = function applyInfrared(image) {
   var width = image.width,
     height = image.height,
@@ -4855,6 +4857,67 @@ var posterize = {
   handle: 'posterize'
 };
 
+var applySolarize = function applySolarize(image, settings) {
+  var width = image.width,
+    height = image.height,
+    data = image.data;
+  var amplitude = Math.max(2, Math.round(settings.amplitude || 4) * 2); // number of color bands
+  var frequency = (settings.frequency || 1) * 20; // sharpness of transitions
+  var phase = settings.phase || 0; // hue rotation
+
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      var idx = (y * width + x) * 4;
+      var r = data[idx];
+      var g = data[idx + 1];
+      var b = data[idx + 2];
+      // Convert to HSV
+      var v = rgbToHsv(r, g, b)[2];
+      // Add noise to v
+      if (settings.noise) {
+        v += (Math.random() - 0.5) * settings.noise * 0.15;
+        v = Math.max(0, Math.min(1, v));
+      }
+      // Smooth banding: blend between bands
+      var bandFloat = Math.pow(v, frequency) * amplitude;
+      var bandA = Math.floor(bandFloat);
+      var bandB = Math.min(amplitude - 1, bandA + 1);
+      var t = bandFloat - bandA;
+      var normA = bandA / (amplitude - 1);
+      var normB = bandB / (amplitude - 1);
+      // Interpolate hue between bands
+      var hueA = (normA + phase) % 1;
+      var hueB = (normB + phase) % 1;
+      // Shortest hue interpolation
+      var dh = hueB - hueA;
+      if (dh > 0.5) dh -= 1;
+      if (dh < -0.5) dh += 1;
+      var hue = (hueA + dh * t + 1) % 1;
+      // Interpolate saturation and value if desired
+      var sat = 0.85 + 0.15 * Math.sin(phase * Math.PI * 2);
+      var val = v;
+      // Compose new color
+      var _hsvToRgb = hsvToRgb(hue, sat, val),
+        _hsvToRgb2 = _slicedToArray$1(_hsvToRgb, 3),
+        nr = _hsvToRgb2[0],
+        ng = _hsvToRgb2[1],
+        nb = _hsvToRgb2[2];
+      data[idx] = nr;
+      data[idx + 1] = ng;
+      data[idx + 2] = nb;
+      // Alpha stays the same
+    }
+  }
+};
+
+var solarize = {
+  apply: applySolarize,
+  category: DITHER_CATEGORIES.COLOR,
+  name: "Solarize",
+  description: "Applies a solarize effect to the image",
+  handle: "solarize"
+};
+
 // Error Diffusion
 
 var dither = /*#__PURE__*/Object.freeze({
@@ -4903,6 +4966,7 @@ var dither = /*#__PURE__*/Object.freeze({
 	sierra: sierra,
 	sierraLite: sierraLite,
 	smoothDiffuse: smoothDiffuse,
+	solarize: solarize,
 	stevensonArce: stevensonArce,
 	stucki: stucki,
 	stukiDiffusionLines: stukiDiffusionLines,
@@ -12221,7 +12285,7 @@ var Controls = function Controls(_ref) {
         },
         className: styles$2.slider
       })]
-    }), (settings.style === 'Modulated Diffuse Y' || settings.style === 'Modulated Diffuse X' || settings.style === 'Composite Video' || settings.style === 'Fractalify' || settings.style === 'Joy Plot' || settings.style === 'Rutt-Etra' || settings.style === 'CRT' || settings.style === 'LZ77' || settings.style === 'Reeded Glass' || settings.style === 'Waveform' || settings.style === 'Waveform Alt' || settings.style === 'Anaglyph' || settings.style === 'Halftone Lines' || settings.style === 'Neon Negative' || settings.style === 'Posterize') && /*#__PURE__*/jsxRuntimeExports.jsx(ModulatedDiffuseControls, {
+    }), (settings.style === 'Modulated Diffuse Y' || settings.style === 'Modulated Diffuse X' || settings.style === 'Composite Video' || settings.style === 'Fractalify' || settings.style === 'Joy Plot' || settings.style === 'Rutt-Etra' || settings.style === 'CRT' || settings.style === 'LZ77' || settings.style === 'Reeded Glass' || settings.style === 'Waveform' || settings.style === 'Waveform Alt' || settings.style === 'Anaglyph' || settings.style === 'Halftone Lines' || settings.style === 'Neon Negative' || settings.style === 'Posterize' || settings.style === 'Solarize') && /*#__PURE__*/jsxRuntimeExports.jsx(ModulatedDiffuseControls, {
       settings: settings,
       onSettingChange: onSettingChange
     }), /*#__PURE__*/jsxRuntimeExports.jsx("div", {
