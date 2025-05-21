@@ -4918,6 +4918,45 @@ var solarize = {
   handle: "solarize"
 };
 
+var applySepia = function applySepia(image, settings) {
+  var width = image.width,
+    height = image.height,
+    data = image.data;
+  var noise = settings.noise;
+  for (var y = 0; y < height; y++) {
+    for (var x = 0; x < width; x++) {
+      var idx = (y * width + x) * 4;
+      var r = data[idx];
+      var g = data[idx + 1];
+      var b = data[idx + 2];
+      // Classic sepia formula
+      var tr = 0.393 * r + 0.769 * g + 0.189 * b;
+      var tg = 0.349 * r + 0.686 * g + 0.168 * b;
+      var tb = 0.272 * r + 0.534 * g + 0.131 * b;
+      // Add noise for aging effect (monochromatic)
+      if (noise) {
+        var n = (Math.random() - 0.5) * noise * 20;
+        tr += n;
+        tg += n;
+        tb += n;
+      }
+      // Clamp
+      data[idx] = Math.max(0, Math.min(255, Math.round(tr)));
+      data[idx + 1] = Math.max(0, Math.min(255, Math.round(tg)));
+      data[idx + 2] = Math.max(0, Math.min(255, Math.round(tb)));
+      // Alpha stays the same
+    }
+  }
+};
+
+var sepia = {
+  handle: "sepia",
+  name: "Sepia",
+  apply: applySepia,
+  description: "Apply a sepia tone to the image",
+  category: DITHER_CATEGORIES.COLOR
+};
+
 // Error Diffusion
 
 var dither = /*#__PURE__*/Object.freeze({
@@ -4963,6 +5002,7 @@ var dither = /*#__PURE__*/Object.freeze({
 	randomOrdered: randomOrdered,
 	reededGlass: reededGlass,
 	ruttEtra: ruttEtra,
+	sepia: sepia,
 	sierra: sierra,
 	sierraLite: sierraLite,
 	smoothDiffuse: smoothDiffuse,
