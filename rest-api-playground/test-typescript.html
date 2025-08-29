@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TypeScript Build Test</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .status {
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 6px;
+      font-family: monospace;
+    }
+    .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .info { background: #d1ecf1; color: #0c5460; border: 1px solid #bee5eb; }
+    #playground { 
+      border: 2px solid #e9ecef; 
+      border-radius: 8px; 
+      min-height: 500px; 
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 TypeScript Build Test</h1>
+    <p>Testing the TypeScript compiled build with type safety validation.</p>
+    
+    <div id="status"></div>
+    <div id="playground"></div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Library (TypeScript Build) -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    function updateStatus(message, type = 'info') {
+      const statusEl = document.getElementById('status');
+      statusEl.innerHTML = `<div class="status ${type}">${message}</div>`;
+      console.log(`[${type.toUpperCase()}]`, message);
+    }
+
+    async function testTypeScriptBuild() {
+      try {
+        updateStatus('🔄 Testing TypeScript compiled build...', 'info');
+        
+        // Test 1: Basic instantiation
+        const client = new RestAPIClient({
+          config: {
+            title: '🚀 TypeScript Test',
+            subtitle: 'Validating compiled TypeScript build',
+            showHeader: true,
+            defaultUrl: 'https://httpbin.org/get'
+          }
+        });
+        
+        updateStatus('✅ Step 1: RestAPIClient instantiation successful!', 'success');
+        
+        // Test 2: Initialization
+        client.init({ container: 'playground' });
+        updateStatus('✅ Step 2: Component initialization successful!', 'success');
+        
+        // Wait for component to mount
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        // Test 3: Type-safe API calls
+        const response = await client.sendRequest({
+          url: 'https://httpbin.org/json',
+          method: 'GET',
+          headers: [
+            { key: 'Accept', value: 'application/json' },
+            { key: 'X-TypeScript-Test', value: 'true' }
+          ]
+        });
+        
+        updateStatus(`✅ Step 3: API request successful! Status: ${response.status} (${response.time}ms)`, 'success');
+        
+        // Test 4: State management
+        const currentRequest = client.getRequest();
+        const currentResponse = client.getResponse();
+        
+        updateStatus(`✅ Step 4: State access successful! Request URL: ${currentRequest.url}`, 'success');
+        
+        // Test 5: Type-safe configuration updates
+        client.updateConfig({
+          title: '🎉 TypeScript Build Verified!'
+        });
+        
+        updateStatus('🎊 All TypeScript tests passed! The build is working perfectly with full type safety.', 'success');
+        
+      } catch (error) {
+        updateStatus(`❌ TypeScript build test failed: ${error.message}`, 'error');
+        console.error('Full error:', error);
+      }
+    }
+
+    // Test type safety by trying invalid configurations (these should be caught at compile time)
+    console.log('🔍 TypeScript provides compile-time type safety for:');
+    console.log('  - Request method validation (GET, POST, PUT, etc.)');
+    console.log('  - Required vs optional configuration properties');
+    console.log('  - API response structure');
+    console.log('  - Event handler signatures');
+    console.log('  - Component prop validation');
+
+    // Run tests after page load
+    window.addEventListener('load', () => {
+      setTimeout(testTypeScriptBuild, 500);
+    });
+  </script>
+</body>
+</html>

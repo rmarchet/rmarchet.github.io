@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REST API Playground - Basic Usage</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 0; 
+      padding: 20px; 
+      background: #f5f5f5; 
+    }
+    .demo-container { 
+      max-width: 1200px; 
+      margin: 0 auto; 
+      background: white; 
+      border-radius: 8px; 
+      padding: 20px; 
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1); 
+    }
+    .controls { 
+      margin-bottom: 20px; 
+      padding: 15px; 
+      background: #f8f9fa; 
+      border-radius: 5px; 
+    }
+    button { 
+      margin: 5px; 
+      padding: 8px 16px; 
+      border: none; 
+      border-radius: 4px; 
+      cursor: pointer; 
+      background: #007bff; 
+      color: white; 
+    }
+    button:hover { background: #0056b3; }
+    #playground { 
+      min-height: 600px; 
+      border: 1px solid #ddd; 
+      border-radius: 8px; 
+    }
+  </style>
+</head>
+<body>
+  <div class="demo-container">
+    <h1>REST API Playground - Demo</h1>
+    
+    <div class="controls">
+      <h3>Controls:</h3>
+      <button onclick="createBasic()">Basic Playground</button>
+      <button onclick="createNoHeader()">No Header</button>
+      <button onclick="createCustom()">Custom Config</button>
+      <button onclick="destroyPlayground()">Destroy</button>
+    </div>
+    
+    <div id="playground"></div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Bundle -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    let currentPlayground = null;
+
+    function destroyPlayground() {
+      if (currentPlayground) {
+        currentPlayground.destroy();
+        currentPlayground = null;
+      }
+    }
+
+    function createBasic() {
+      destroyPlayground();
+      currentPlayground = new RestAPIClient({
+        config: {
+          title: 'Basic Playground',
+          subtitle: 'Simple REST API testing',
+          showHeader: true,
+          showQuickStart: true,
+          defaultUrl: 'https://httpbin.org/get'
+        }
+      });
+      currentPlayground.init({ container: 'playground' });
+    }
+
+    function createNoHeader() {
+      destroyPlayground();
+      currentPlayground = new RestAPIClient({
+        config: {
+          showHeader: false,
+          showQuickStart: false,
+          defaultUrl: 'https://reqres.in/api/users'
+        }
+      });
+      currentPlayground.init({ container: 'playground' });
+    }
+
+    function createCustom() {
+      destroyPlayground();
+      currentPlayground = new RestAPIClient({
+        config: {
+          title: '🚀 Custom API Tester',
+          subtitle: 'Powered by RestAPIClient',
+          showHeader: true,
+          showQuickStart: true,
+          defaultUrl: 'https://jsonplaceholder.typicode.com/users/1'
+        }
+      });
+      currentPlayground.init({ container: 'playground' });
+    }
+
+    // Initialize with basic playground on load
+    createBasic();
+  </script>
+</body>
+</html>

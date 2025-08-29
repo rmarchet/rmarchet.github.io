@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Management API Documentation</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background: #fafbfc;
+    }
+    
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 2rem 0;
+      text-align: center;
+    }
+    
+    .header h1 {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .header p {
+      font-size: 1.2rem;
+      opacity: 0.9;
+    }
+    
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem;
+    }
+    
+    .nav {
+      background: white;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    
+    .nav ul {
+      list-style: none;
+      display: flex;
+      padding: 1rem 0;
+    }
+    
+    .nav li {
+      margin-right: 2rem;
+    }
+    
+    .nav a {
+      text-decoration: none;
+      color: #666;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+    
+    .nav a:hover {
+      color: #667eea;
+    }
+    
+    .content {
+      background: white;
+      margin: 2rem 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .section {
+      padding: 2rem;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .section:last-child {
+      border-bottom: none;
+    }
+    
+    .section h2 {
+      color: #2c3e50;
+      margin-bottom: 1rem;
+      font-size: 1.8rem;
+    }
+    
+    .section h3 {
+      color: #34495e;
+      margin: 1.5rem 0 1rem 0;
+      font-size: 1.3rem;
+    }
+    
+    .endpoint {
+      background: #f8f9fa;
+      border-left: 4px solid #667eea;
+      padding: 1.5rem;
+      margin: 1.5rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    .endpoint-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
+    
+    .method {
+      padding: 0.25rem 0.75rem;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+    }
+    
+    .method.get { background: #10b981; color: white; }
+    .method.post { background: #3b82f6; color: white; }
+    .method.put { background: #f59e0b; color: white; }
+    .method.delete { background: #ef4444; color: white; }
+    
+    .endpoint-url {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 1.1rem;
+      color: #2c3e50;
+    }
+    
+    .params {
+      background: white;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      margin: 1rem 0;
+    }
+    
+    .params-header {
+      background: #f3f4f6;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #e5e7eb;
+      font-weight: 600;
+      color: #374151;
+    }
+    
+    .param {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      display: grid;
+      grid-template-columns: 150px 100px 1fr;
+      gap: 1rem;
+      align-items: start;
+    }
+    
+    .param:last-child {
+      border-bottom: none;
+    }
+    
+    .param-name {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-weight: 600;
+      color: #6366f1;
+    }
+    
+    .param-type {
+      background: #e5e7eb;
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+      font-size: 0.875rem;
+      color: #374151;
+    }
+    
+    .param-desc {
+      color: #6b7280;
+    }
+    
+    .playground-section {
+      background: #f0f9ff;
+      padding: 2rem;
+      border-radius: 8px;
+      margin: 2rem 0;
+      border: 1px solid #e0f2fe;
+    }
+    
+    .playground-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .playground-header h3 {
+      margin: 0;
+      color: #0c4a6e;
+    }
+    
+    .playground-icon {
+      background: #0ea5e9;
+      color: white;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+    
+    .playground-container {
+      border-radius: 10px;
+      min-height: 500px;
+    }
+    
+    .response-example {
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 1.5rem;
+      border-radius: 4px;
+      margin: 1rem 0;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 0.875rem;
+      overflow-x: auto;
+    }
+    
+    .status-code {
+      background: #10b981;
+      color: white;
+      padding: 0.25rem 0.5rem;
+      border-radius: 3px;
+      font-weight: 600;
+      margin-right: 0.5rem;
+    }
+    
+    .footer {
+      background: #2c3e50;
+      color: white;
+      text-align: center;
+      padding: 2rem 0;
+      margin-top: 3rem;
+    }
+    
+    .code-block {
+      background: #f8f9fa;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      padding: 1rem;
+      margin: 1rem 0;
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 0.875rem;
+      overflow-x: auto;
+    }
+    
+    .note {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    .note-icon {
+      color: #d97706;
+      margin-right: 0.5rem;
+    }
+    
+    @media (max-width: 768px) {
+      .param {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+      }
+      
+      .endpoint-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      
+      .nav ul {
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="container">
+      <h1>User Management API</h1>
+      <p>Complete REST API for user registration, authentication, and profile management</p>
+    </div>
+  </div>
+  
+  <nav class="nav">
+    <div class="container">
+      <ul>
+        <li><a href="#overview">Overview</a></li>
+        <li><a href="#authentication">Authentication</a></li>
+        <li><a href="#users">Users</a></li>
+        <li><a href="#profiles">Profiles</a></li>
+        <li><a href="#playground">Try it Live</a></li>
+      </ul>
+    </div>
+  </nav>
+  
+  <div class="container">
+    <div class="content">
+      <section id="overview" class="section">
+        <h2>📋 API Overview</h2>
+        <p>The User Management API provides a comprehensive set of endpoints for managing user accounts, authentication, and user profiles. This RESTful API follows standard HTTP conventions and returns JSON responses.</p>
+        
+        <h3>Base URL</h3>
+        <div class="code-block">
+          https://api.userservice.com/v1
+        </div>
+        
+        <h3>Response Format</h3>
+        <p>All API responses are in JSON format and include standard HTTP status codes. Error responses include detailed error messages and codes for debugging.</p>
+        
+        <div class="note">
+          <span class="note-icon">💡</span>
+          <strong>Note:</strong> For demonstration purposes, we're using httpbin.org endpoints which echo back the request data. In a real implementation, these would be your actual API endpoints.
+        </div>
+      </section>
+      
+      <section id="authentication" class="section">
+        <h2>🔐 Authentication</h2>
+        <p>The API uses Bearer token authentication. Include your API token in the Authorization header for all requests.</p>
+        
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method post">POST</span>
+            <span class="endpoint-url">/auth/login</span>
+          </div>
+          <p>Authenticate a user and receive an access token.</p>
+          
+          <div class="params">
+            <div class="params-header">Request Body</div>
+            <div class="param">
+              <div class="param-name">email</div>
+              <div class="param-type">string</div>
+              <div class="param-desc">User's email address</div>
+            </div>
+            <div class="param">
+              <div class="param-name">password</div>
+              <div class="param-type">string</div>
+              <div class="param-desc">User's password</div>
+            </div>
+          </div>
+          
+          <h4>Example Response</h4>
+          <div class="response-example">
+<span class="status-code">200</span>OK
+{
+  "access_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "token_type": "Bearer",
+  "expires_in": 3600,
+  "user": {
+    "id": 1,
+    "email": "john@example.com",
+    "name": "John Doe"
+  }
+}
+          </div>
+        </div>
+        
+        <div class="playground-section">
+          <div class="playground-header">
+            <div class="playground-icon">🔐</div>
+            <h3>Try Authentication</h3>
+          </div>
+          <p>Test the login endpoint with sample credentials. The playground below is pre-configured with a POST request to simulate user authentication.</p>
+          <div id="auth-playground" class="playground-container"></div>
+        </div>
+      </section>
+      
+      <section id="users" class="section">
+        <h2>👥 User Management</h2>
+        
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="endpoint-url">/users</span>
+          </div>
+          <p>Retrieve a list of all users with optional filtering and pagination.</p>
+          
+          <div class="params">
+            <div class="params-header">Query Parameters</div>
+            <div class="param">
+              <div class="param-name">page</div>
+              <div class="param-type">integer</div>
+              <div class="param-desc">Page number for pagination (default: 1)</div>
+            </div>
+            <div class="param">
+              <div class="param-name">limit</div>
+              <div class="param-type">integer</div>
+              <div class="param-desc">Number of users per page (default: 20, max: 100)</div>
+            </div>
+            <div class="param">
+              <div class="param-name">role</div>
+              <div class="param-type">string</div>
+              <div class="param-desc">Filter by user role (admin, user, moderator)</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="endpoint-url">/users/{id}</span>
+          </div>
+          <p>Get detailed information about a specific user by their ID.</p>
+          
+          <div class="params">
+            <div class="params-header">Path Parameters</div>
+            <div class="param">
+              <div class="param-name">id</div>
+              <div class="param-type">integer</div>
+              <div class="param-desc">Unique identifier for the user</div>
+            </div>
+          </div>
+          
+          <h4>Example Response</h4>
+          <div class="response-example">
+<span class="status-code">200</span>OK
+{
+  "id": 1,
+  "email": "john@example.com",
+  "name": "John Doe",
+  "role": "user",
+  "created_at": "2023-01-15T10:30:00Z",
+  "last_login": "2023-12-08T14:22:00Z",
+  "profile": {
+    "avatar": "https://example.com/avatars/john.jpg",
+    "bio": "Software developer passionate about APIs",
+    "location": "San Francisco, CA"
+  }
+}
+          </div>
+        </div>
+        
+        <div class="playground-section">
+          <div class="playground-header">
+            <div class="playground-icon">👤</div>
+            <h3>Try User Endpoints</h3>
+          </div>
+          <p>Test user retrieval endpoints. Switch between getting user lists and specific user details.</p>
+          <div id="users-playground" class="playground-container"></div>
+        </div>
+        
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method post">POST</span>
+            <span class="endpoint-url">/users</span>
+          </div>
+          <p>Create a new user account.</p>
+          
+          <div class="params">
+            <div class="params-header">Request Body</div>
+            <div class="param">
+              <div class="param-name">email</div>
+              <div class="param-type">string</div>
+              <div class="param-desc">User's email address (must be unique)</div>
+            </div>
+            <div class="param">
+              <div class="param-name">name</div>
+              <div class="param-type">string</div>
+              <div class="param-desc">User's full name</div>
+            </div>
+            <div class="param">
+              <div class="param-name">password</div>
+              <div class="param-type">string</div>
+              <div class="param-desc">User's password (min 8 characters)</div>
+            </div>
+            <div class="param">
+              <div class="param-name">role</div>
+              <div class="param-type">string</div>
+              <div class="param-desc">User role (optional, default: "user")</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method put">PUT</span>
+            <span class="endpoint-url">/users/{id}</span>
+          </div>
+          <p>Update an existing user's information.</p>
+        </div>
+        
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method delete">DELETE</span>
+            <span class="endpoint-url">/users/{id}</span>
+          </div>
+          <p>Delete a user account permanently.</p>
+        </div>
+        
+        <div class="playground-section">
+          <div class="playground-header">
+            <div class="playground-icon">✏️</div>
+            <h3>Try User Creation</h3>
+          </div>
+          <p>Test creating new users with the POST endpoint. The playground below is configured for user creation.</p>
+          <div id="create-user-playground" class="playground-container"></div>
+        </div>
+      </section>
+      
+      <section id="profiles" class="section">
+        <h2>📝 User Profiles</h2>
+        
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method get">GET</span>
+            <span class="endpoint-url">/users/{id}/profile</span>
+          </div>
+          <p>Get detailed profile information for a specific user.</p>
+        </div>
+        
+        <div class="endpoint">
+          <div class="endpoint-header">
+            <span class="method put">PUT</span>
+            <span class="endpoint-url">/users/{id}/profile</span>
+          </div>
+          <p>Update a user's profile information.</p>
+          
+          <div class="params">
+            <div class="params-header">Request Body</div>
+            <div class="param">
+              <div class="param-name">bio</div>
+              <div class="param-type">string</div>
+              <div class="param-desc">User's biography (max 500 characters)</div>
+            </div>
+            <div class="param">
+              <div class="param-name">location</div>
+              <div class="param-type">string</div>
+              <div class="param-desc">User's location</div>
+            </div>
+            <div class="param">
+              <div class="param-name">website</div>
+              <div class="param-type">string</div>
+              <div class="param-desc">User's website URL</div>
+            </div>
+            <div class="param">
+              <div class="param-name">avatar</div>
+              <div class="param-type">string</div>
+              <div class="param-desc">URL to user's avatar image</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="playground-section">
+          <div class="playground-header">
+            <div class="playground-icon">🎨</div>
+            <h3>Try Profile Updates</h3>
+          </div>
+          <p>Test profile update functionality. The playground is configured to update user profile information.</p>
+          <div id="profile-playground" class="playground-container"></div>
+        </div>
+      </section>
+      
+      <section id="playground" class="section">
+        <h2>🎮 Interactive API Playground</h2>
+        <p>Use the playground below to test any endpoint with custom parameters. This is a full-featured REST client where you can:</p>
+        <ul style="margin: 1rem 0; padding-left: 2rem;">
+          <li>Change HTTP methods (GET, POST, PUT, DELETE)</li>
+          <li>Modify URLs and add query parameters</li>
+          <li>Add custom headers (like Authorization tokens)</li>
+          <li>Send JSON request bodies</li>
+          <li>View formatted responses with timing information</li>
+        </ul>
+        
+        <div class="playground-section">
+          <div class="playground-header">
+            <div class="playground-icon">🚀</div>
+            <h3>Full API Playground</h3>
+          </div>
+          <div id="main-playground" class="playground-container"></div>
+        </div>
+      </section>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <div class="container">
+      <p>&copy; 2023 User Management API. Built with REST API Playground for interactive documentation.</p>
+    </div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Library -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        // Authentication Playground
+        const authPlayground = new RestAPIClient({
+          config: {
+            theme: 'light',
+            showHeader: false,
+            requestLabel: 'Login Request',
+            responseLabel: 'Authentication Response',
+            defaultUrl: 'https://httpbin.org/post'
+          }
+        });
+        authPlayground.init({ container: 'auth-playground' });
+        
+        // Pre-configure authentication request
+        authPlayground.ready().then(() => {
+          authPlayground.setRequest({
+            url: 'https://httpbin.org/post',
+            method: 'POST',
+            headers: [
+              { key: 'Content-Type', value: 'application/json' },
+              { key: 'Accept', value: 'application/json' }
+            ],
+            body: JSON.stringify({
+              email: 'john@example.com',
+              password: 'securepassword123'
+            }, null, 2)
+          });
+        });
+        
+        // Users Playground
+        const usersPlayground = new RestAPIClient({
+          config: {
+            theme: 'light',
+            showHeader: false,
+            requestLabel: 'User Request',
+            responseLabel: 'User Data',
+            showQuickStart: true,
+            defaultUrl: 'https://jsonplaceholder.typicode.com/users'
+          }
+        });
+        usersPlayground.init({ container: 'users-playground' });
+        
+        // Create User Playground
+        const createUserPlayground = new RestAPIClient({
+          config: {
+            theme: 'light',
+            showHeader: false,
+            requestLabel: 'Create User',
+            responseLabel: 'Created User',
+            defaultUrl: 'https://httpbin.org/post'
+          }
+        });
+        createUserPlayground.init({ container: 'create-user-playground' });
+        
+        // Pre-configure create user request
+        createUserPlayground.ready().then(() => {
+          createUserPlayground.setRequest({
+            url: 'https://httpbin.org/post',
+            method: 'POST',
+            headers: [
+              { key: 'Content-Type', value: 'application/json' },
+              { key: 'Authorization', value: 'Bearer your-api-token-here' }
+            ],
+            body: JSON.stringify({
+              email: 'newuser@example.com',
+              name: 'Jane Smith',
+              password: 'strongpassword456',
+              role: 'user'
+            }, null, 2)
+          });
+        });
+        
+        // Profile Playground
+        const profilePlayground = new RestAPIClient({
+          config: {
+            theme: 'light',
+            showHeader: false,
+            requestLabel: 'Profile Update',
+            responseLabel: 'Updated Profile',
+            defaultUrl: 'https://httpbin.org/put'
+          }
+        });
+        profilePlayground.init({ container: 'profile-playground' });
+        
+        // Pre-configure profile update request
+        profilePlayground.ready().then(() => {
+          profilePlayground.setRequest({
+            url: 'https://httpbin.org/put',
+            method: 'PUT',
+            headers: [
+              { key: 'Content-Type', value: 'application/json' },
+              { key: 'Authorization', value: 'Bearer user-token-here' }
+            ],
+            body: JSON.stringify({
+              bio: 'Full-stack developer with 5+ years experience in web technologies',
+              location: 'San Francisco, CA',
+              website: 'https://janesmith.dev',
+              avatar: 'https://example.com/avatars/jane.jpg'
+            }, null, 2)
+          });
+        });
+        
+        // Main Playground - Full featured
+        const mainPlayground = new RestAPIClient({
+          config: {
+            title: 'API Testing Playground',
+            subtitle: 'Test any endpoint with custom parameters',
+            theme: 'light',
+            showHeader: true,
+            requestLabel: 'API Request',
+            responseLabel: 'API Response',
+            showQuickStart: true,
+            defaultUrl: 'https://jsonplaceholder.typicode.com/users/1'
+          }
+        });
+        mainPlayground.init({ container: 'main-playground' });
+        
+        // Send initial requests to show responses
+        setTimeout(() => {
+          authPlayground.sendRequest();
+          usersPlayground.sendRequest();
+          createUserPlayground.sendRequest();
+          profilePlayground.sendRequest();
+        }, 1000);
+        
+      }, 100);
+    });
+    
+    // Smooth scrolling for navigation links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>

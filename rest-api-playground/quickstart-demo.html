@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quick Start Toggle Demo</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .demo-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+    }
+    .playground-container {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      min-height: 400px;
+      margin: 15px 0;
+    }
+    button {
+      margin: 5px;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .btn-primary { background: #007bff; color: white; }
+    .btn-primary:hover { background: #0056b3; }
+    .btn-secondary { background: #6c757d; color: white; }
+    .btn-secondary:hover { background: #545b62; }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+    .enabled { background: #d4edda; color: #155724; }
+    .disabled { background: #f8d7da; color: #721c24; }
+    .code {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: monospace;
+      margin: 10px 0;
+      border-left: 4px solid #007bff;
+    }
+    .highlight { 
+      background: #fff3cd; 
+      padding: 2px 6px; 
+      border-radius: 3px; 
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎛️ Quick Start Toggle Demo</h1>
+    <p><strong>See the difference between showing and hiding the Quick Start selector</strong></p>
+    
+    <div class="demo-section">
+      <h3>🎯 What is Quick Start?</h3>
+      <p>The Quick Start selector provides pre-made sample requests (Get User, Create Post, Update Post) that users can quickly select to test common API patterns.</p>
+      
+      <div class="code">
+        // Default behavior (Quick Start hidden)<br>
+        showQuickStart: <span class="highlight">false</span><br><br>
+        
+        // Enable Quick Start selector<br>
+        showQuickStart: <span class="highlight">true</span>
+      </div>
+    </div>
+    
+    <div class="demo-section">
+      <h3>🔄 Toggle Demo</h3>
+      <div id="status" class="status disabled">Quick Start: DISABLED</div>
+      
+      <button id="toggleBtn" class="btn-primary" onclick="toggleQuickStart()">
+        Enable Quick Start
+      </button>
+      <button class="btn-secondary" onclick="resetDemo()">Reset Demo</button>
+      
+      <div id="playground" class="playground-container"></div>
+    </div>
+    
+    <div class="demo-section">
+      <h3>📋 Key Benefits:</h3>
+      <ul>
+        <li><strong>Default: false</strong> - Clean, minimal interface</li>
+        <li><strong>When enabled</strong> - Provides sample requests for quick testing</li>
+        <li><strong>User-friendly</strong> - Great for demos and tutorials</li>
+        <li><strong>Flexible</strong> - Can be toggled per playground instance</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Library -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    let currentPlayground = null;
+    let showQuickStart = false;
+    
+    function updateStatus() {
+      const statusEl = document.getElementById('status');
+      const toggleBtn = document.getElementById('toggleBtn');
+      
+      if (showQuickStart) {
+        statusEl.textContent = 'Quick Start: ENABLED';
+        statusEl.className = 'status enabled';
+        toggleBtn.textContent = 'Disable Quick Start';
+      } else {
+        statusEl.textContent = 'Quick Start: DISABLED';
+        statusEl.className = 'status disabled';
+        toggleBtn.textContent = 'Enable Quick Start';
+      }
+    }
+    
+    function createPlayground() {
+      if (currentPlayground) {
+        currentPlayground.destroy();
+      }
+      
+      currentPlayground = new RestAPIClient({
+        config: {
+          title: showQuickStart ? '✅ With Quick Start' : '🚫 No Quick Start',
+          subtitle: `showQuickStart: ${showQuickStart}`,
+          showHeader: true,
+          showQuickStart: showQuickStart,
+          defaultUrl: 'https://jsonplaceholder.typicode.com/posts/1'
+        }
+      });
+      
+      currentPlayground.init({ container: 'playground' });
+      console.log(`Playground recreated with showQuickStart: ${showQuickStart}`);
+    }
+    
+    function toggleQuickStart() {
+      showQuickStart = !showQuickStart;
+      updateStatus();
+      createPlayground();
+    }
+    
+    function resetDemo() {
+      showQuickStart = false;
+      updateStatus();
+      createPlayground();
+    }
+    
+    // Initialize on page load
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        updateStatus();
+        createPlayground();
+      }, 100);
+    });
+  </script>
+</body>
+</html>

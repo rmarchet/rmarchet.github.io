@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REST API Client - API Methods Test</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .controls { 
+      margin-bottom: 20px; 
+      padding: 20px; 
+      background: #f8f9fa; 
+      border-radius: 8px;
+      border-left: 4px solid #007bff;
+    }
+    .control-group {
+      margin-bottom: 15px;
+    }
+    .control-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: 600;
+      color: #333;
+    }
+    button { 
+      margin: 5px; 
+      padding: 10px 20px; 
+      border: none; 
+      border-radius: 6px; 
+      cursor: pointer; 
+      font-weight: 600;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: #007bff; color: white; }
+    .btn-success { background: #28a745; color: white; }
+    .btn-warning { background: #ffc107; color: #212529; }
+    .btn-info { background: #17a2b8; color: white; }
+    .btn-danger { background: #dc3545; color: white; }
+    button:hover { transform: translateY(-1px); opacity: 0.9; }
+    input, textarea, select {
+      width: 100%;
+      padding: 8px 12px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #007bff;
+    }
+    .playground { 
+      border: 2px solid #e9ecef; 
+      border-radius: 8px; 
+      min-height: 600px; 
+      background: white;
+    }
+    .status {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    .status.success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .status.error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 REST API Client - API Methods Demo</h1>
+    <p>This demo showcases the programmatic API methods available in RestAPIClient.</p>
+    
+    <div class="controls">
+      <h3>🎛️ API Control Panel</h3>
+      
+      <div class="grid">
+        <div class="control-group">
+          <label>URL:</label>
+          <input type="text" id="url" value="https://httpbin.org/get" placeholder="Enter API URL">
+        </div>
+        
+        <div class="control-group">
+          <label>Method:</label>
+          <select id="method">
+            <option value="GET">GET</option>
+            <option value="POST">POST</option>
+            <option value="PUT">PUT</option>
+            <option value="PATCH">PATCH</option>
+            <option value="DELETE">DELETE</option>
+          </select>
+        </div>
+      </div>
+      
+      <div class="control-group">
+        <label>Request Body (JSON):</label>
+        <textarea id="body" rows="3" placeholder='{"key": "value"}'></textarea>
+      </div>
+      
+      <div style="margin-top: 20px;">
+        <button class="btn-primary" onclick="sendCustomRequest()">📤 Send Custom Request</button>
+        <button class="btn-success" onclick="sendQuickRequests()">⚡ Send Quick Tests</button>
+        <button class="btn-info" onclick="getCurrentState()">📊 Get Current State</button>
+        <button class="btn-warning" onclick="clearResponse()">🧹 Clear Response</button>
+        <button class="btn-danger" onclick="testErrorHandling()">💥 Test Error</button>
+      </div>
+      
+      <div id="status"></div>
+    </div>
+    
+    <div id="playground" class="playground"></div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Library -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    let client = null;
+    
+    // Initialize the client
+    function initClient() {
+      client = new RestAPIClient({ 
+        config: {
+          title: '🧪 API Methods Demo',
+          subtitle: 'Testing programmatic control',
+          showHeader: true,
+          defaultUrl: 'https://httpbin.org/get'
+        }
+      });
+      
+      client.init({ container: 'playground' });
+      updateStatus('✅ RestAPIClient initialized successfully!', 'success');
+    }
+    
+    // Send a custom request with form values
+    async function sendCustomRequest() {
+      if (!client) return;
+      
+      const url = document.getElementById('url').value;
+      const method = document.getElementById('method').value;
+      const body = document.getElementById('body').value;
+      
+      const headers = [
+        { key: 'Content-Type', value: 'application/json' },
+        { key: 'X-Demo', value: 'RestAPIClient-Test' }
+      ];
+      
+      try {
+        updateStatus(`🚀 Sending ${method} request to ${url}...`, 'info');
+        
+        const response = await client.sendRequest({
+          url: url,
+          method: method,
+          headers: headers,
+          body: body
+        });
+        
+        updateStatus(`✅ Request completed! Status: ${response.status} ${response.statusText} (${response.time}ms)`, 'success');
+      } catch (error) {
+        updateStatus(`❌ Request failed: ${error.message}`, 'error');
+      }
+    }
+    
+    // Send multiple quick test requests
+    async function sendQuickRequests() {
+      if (!client) return;
+      
+      const tests = [
+        { name: 'GET User', url: 'https://jsonplaceholder.typicode.com/users/1', method: 'GET' },
+        { name: 'GET Posts', url: 'https://jsonplaceholder.typicode.com/posts?_limit=3', method: 'GET' },
+        { name: 'POST Data', url: 'https://httpbin.org/post', method: 'POST', body: '{"test": "data", "timestamp": "' + new Date().toISOString() + '"}' }
+      ];
+      
+      updateStatus('🔄 Running quick test suite...', 'info');
+      
+      for (let i = 0; i < tests.length; i++) {
+        const test = tests[i];
+        try {
+          updateStatus(`📡 ${i + 1}/${tests.length}: ${test.name} (${test.method} ${test.url})`, 'info');
+          
+          const response = await client.sendRequest({
+            url: test.url,
+            method: test.method,
+            body: test.body || '',
+            headers: [{ key: 'Content-Type', value: 'application/json' }]
+          });
+          
+          // Wait a bit to see each request
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          
+        } catch (error) {
+          updateStatus(`❌ Test ${i + 1} failed: ${error.message}`, 'error');
+          break;
+        }
+      }
+      
+      updateStatus(`✅ Quick test suite completed!`, 'success');
+    }
+    
+    // Get current state information
+    function getCurrentState() {
+      if (!client) return;
+      
+      const request = client.getRequest();
+      const response = client.getResponse();
+      const error = client.getError();
+      const loading = client.isLoading();
+      
+      const state = {
+        request: request,
+        response: response ? `${response.status} ${response.statusText} (${response.time}ms)` : null,
+        error: error,
+        loading: loading,
+        config: client.getConfig()
+      };
+      
+      updateStatus(`📊 Current State:\n${JSON.stringify(state, null, 2)}`, 'info');
+    }
+    
+    // Clear the response
+    function clearResponse() {
+      if (!client) return;
+      
+      client.clearResponse();
+      updateStatus('🧹 Response cleared!', 'success');
+    }
+    
+    // Test error handling
+    async function testErrorHandling() {
+      if (!client) return;
+      
+      try {
+        updateStatus('💥 Testing error handling with invalid URL...', 'info');
+        
+        await client.sendRequest({
+          url: 'https://invalid-domain-that-does-not-exist.com/api',
+          method: 'GET'
+        });
+        
+      } catch (error) {
+        updateStatus(`✅ Error handling works! Caught: ${error.message}`, 'success');
+      }
+    }
+    
+    // Utility function to update status
+    function updateStatus(message, type = 'info') {
+      const statusEl = document.getElementById('status');
+      statusEl.textContent = message;
+      statusEl.className = `status ${type}`;
+      console.log(`[${type.toUpperCase()}]`, message);
+    }
+    
+    // Initialize on page load
+    window.addEventListener('load', () => {
+      updateStatus('🔄 Initializing RestAPIClient...', 'info');
+      initClient();
+    });
+  </script>
+</body>
+</html>

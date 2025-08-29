@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Branding Showcase - Custom Labels in Action</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .brand-demo {
+      margin: 30px 0;
+      padding: 20px;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+    }
+    .brand-header {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid #e9ecef;
+    }
+    .brand-logo {
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      color: white;
+    }
+    .brand-info h3 {
+      margin: 0;
+      color: #495057;
+    }
+    .brand-info p {
+      margin: 5px 0 0 0;
+      color: #6c757d;
+      font-size: 14px;
+    }
+    .playground-container {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      min-height: 400px;
+    }
+    .control-panel {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 15px 0;
+    }
+    .control-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin: 10px 0;
+    }
+    .control-row label {
+      min-width: 120px;
+      font-weight: 500;
+    }
+    .control-row input {
+      padding: 8px 12px;
+      border: 1px solid #ced4da;
+      border-radius: 4px;
+      font-size: 14px;
+      flex: 1;
+      max-width: 200px;
+    }
+    .control-row button {
+      padding: 8px 16px;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .control-row button:hover {
+      background: #0056b3;
+    }
+    .feature-list {
+      background: #e3f2fd;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+    .feature-list h3 {
+      margin: 0 0 15px 0;
+      color: #1565c0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Branding Showcase</h1>
+    <p><strong>See how custom panel labels can adapt the playground to different contexts and brands</strong></p>
+    
+    <div class="feature-list">
+      <h3>✨ Branding Benefits:</h3>
+      <ul>
+        <li><strong>🏢 Corporate Integration:</strong> Match your company's API documentation style</li>
+        <li><strong>📚 Educational Content:</strong> Use beginner-friendly terminology</li>
+        <li><strong>🌍 Internationalization:</strong> Support multiple languages</li>
+        <li><strong>🔧 Domain Expertise:</strong> Use industry-specific terms</li>
+        <li><strong>👥 User Experience:</strong> Reduce cognitive load with familiar terms</li>
+      </ul>
+    </div>
+    
+    <!-- E-commerce API -->
+    <div class="brand-demo">
+      <div class="brand-header">
+        <div class="brand-logo" style="background: #ff6b35;">🛒</div>
+        <div class="brand-info">
+          <h3>E-commerce API Platform</h3>
+          <p>Online store integration testing with product-focused terminology</p>
+        </div>
+      </div>
+      <div id="ecommerce-playground" class="playground-container"></div>
+    </div>
+    
+    <!-- GraphQL Service -->
+    <div class="brand-demo">
+      <div class="brand-header">
+        <div class="brand-logo" style="background: #e10098;">⚡</div>
+        <div class="brand-info">
+          <h3>GraphQL Query Explorer</h3>
+          <p>Modern GraphQL testing with query-specific labels</p>
+        </div>
+      </div>
+      <div id="graphql-playground" class="playground-container"></div>
+    </div>
+    
+    <!-- Financial API -->
+    <div class="brand-demo">
+      <div class="brand-header">
+        <div class="brand-logo" style="background: #1565c0;">💳</div>
+        <div class="brand-info">
+          <h3>Financial Services API</h3>
+          <p>Banking and payment processing with transaction terminology</p>
+        </div>
+      </div>
+      <div id="financial-playground" class="playground-container"></div>
+    </div>
+    
+    <!-- IoT Device Management -->
+    <div class="brand-demo">
+      <div class="brand-header">
+        <div class="brand-logo" style="background: #4caf50;">🌐</div>
+        <div class="brand-info">
+          <h3>IoT Device Manager</h3>
+          <p>Internet of Things device control with hardware-focused terms</p>
+        </div>
+      </div>
+      <div id="iot-playground" class="playground-container"></div>
+    </div>
+    
+    <!-- Custom Interactive Demo -->
+    <div class="brand-demo">
+      <div class="brand-header">
+        <div class="brand-logo" style="background: #9c27b0;">🎛️</div>
+        <div class="brand-info">
+          <h3>Interactive Label Customizer</h3>
+          <p>Try your own custom labels in real-time!</p>
+        </div>
+      </div>
+      
+      <div class="control-panel">
+        <h4>🔧 Customize Labels:</h4>
+        <div class="control-row">
+          <label>Request Label:</label>
+          <input type="text" id="request-label" value="My Request" placeholder="Enter request label">
+        </div>
+        <div class="control-row">
+          <label>Response Label:</label>
+          <input type="text" id="response-label" value="My Response" placeholder="Enter response label">
+        </div>
+        <div class="control-row">
+          <label></label>
+          <button onclick="updateCustomLabels()">Update Labels</button>
+          <button onclick="resetLabels()">Reset to Default</button>
+        </div>
+      </div>
+      
+      <div id="custom-playground" class="playground-container"></div>
+    </div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Library -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    let customDemo = null;
+    
+    function updateCustomLabels() {
+      const requestLabel = document.getElementById('request-label').value.trim() || 'Request';
+      const responseLabel = document.getElementById('response-label').value.trim() || 'Response';
+      
+      if (customDemo) {
+        customDemo.updateConfig({
+          requestLabel: requestLabel,
+          responseLabel: responseLabel
+        });
+      }
+    }
+    
+    function resetLabels() {
+      document.getElementById('request-label').value = 'Request';
+      document.getElementById('response-label').value = 'Response';
+      updateCustomLabels();
+    }
+    
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        // E-commerce API
+        const ecommerceDemo = new RestAPIClient({
+          config: {
+            title: 'Product API Testing',
+            subtitle: 'Test your e-commerce endpoints',
+            requestLabel: 'Product Query',
+            responseLabel: 'Product Data',
+            defaultUrl: 'https://httpbin.org/json',
+            showQuickStart: true
+          }
+        });
+        ecommerceDemo.init({ container: 'ecommerce-playground' });
+        
+        // GraphQL
+        const graphqlDemo = new RestAPIClient({
+          config: {
+            title: 'GraphQL Explorer',
+            subtitle: 'Execute GraphQL queries',
+            requestLabel: 'Query',
+            responseLabel: 'Data',
+            defaultUrl: 'https://httpbin.org/post',
+            showQuickStart: false
+          }
+        });
+        graphqlDemo.init({ container: 'graphql-playground' });
+        
+        // Financial API
+        const financialDemo = new RestAPIClient({
+          config: {
+            title: 'Transaction API',
+            subtitle: 'Process financial transactions',
+            requestLabel: 'Transaction',
+            responseLabel: 'Receipt',
+            defaultUrl: 'https://httpbin.org/uuid',
+            showQuickStart: true
+          }
+        });
+        financialDemo.init({ container: 'financial-playground' });
+        
+        // IoT Device Management
+        const iotDemo = new RestAPIClient({
+          config: {
+            title: 'Device Control Panel',
+            subtitle: 'Manage IoT devices',
+            requestLabel: 'Command',
+            responseLabel: 'Device Status',
+            defaultUrl: 'https://httpbin.org/get',
+            showQuickStart: true
+          }
+        });
+        iotDemo.init({ container: 'iot-playground' });
+        
+        // Custom Interactive Demo
+        customDemo = new RestAPIClient({
+          config: {
+            title: 'Custom Label Tester',
+            subtitle: 'Your personalized playground',
+            requestLabel: 'My Request',
+            responseLabel: 'My Response',
+            defaultUrl: 'https://httpbin.org/headers',
+            showQuickStart: true
+          }
+        });
+        customDemo.init({ container: 'custom-playground' });
+        
+        // Send initial requests to populate responses
+        setTimeout(() => {
+          ecommerceDemo.sendRequest();
+          graphqlDemo.sendRequest();
+          financialDemo.sendRequest();
+          iotDemo.sendRequest();
+          customDemo.sendRequest();
+        }, 1000);
+        
+      }, 100);
+    });
+  </script>
+</body>
+</html>

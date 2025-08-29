@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Theme System Deep Dive</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .section {
+      margin: 30px 0;
+      padding: 20px;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+    }
+    .variable-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .variable-group {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 4px solid #007bff;
+    }
+    .variable-group h4 {
+      margin: 0 0 10px 0;
+      color: #495057;
+    }
+    .variable-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #e9ecef;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    .variable-item:last-child {
+      border-bottom: none;
+    }
+    .variable-name {
+      font-weight: 600;
+      color: #6f42c1;
+    }
+    .variable-value {
+      color: #28a745;
+    }
+    .color-swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 3px;
+      border: 1px solid #ccc;
+      margin-left: 8px;
+    }
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+      margin: 20px 0;
+    }
+    .demo-card {
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    .demo-header {
+      background: #f8f9fa;
+      padding: 15px;
+      border-bottom: 1px solid #e9ecef;
+      text-align: center;
+    }
+    .playground-mini {
+      height: 300px;
+    }
+    .code-block {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 14px;
+      border-left: 4px solid #28a745;
+      margin: 15px 0;
+    }
+    .highlight {
+      background: #fff3cd;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+      color: #856404;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎨 Theme System Deep Dive</h1>
+    <p><strong>Comprehensive exploration of the CSS variables-based theme system</strong></p>
+    
+    <div class="section">
+      <h2>🔧 CSS Variables Architecture</h2>
+      <p>The theme system uses CSS custom properties (variables) for consistent theming across all components:</p>
+      
+      <div class="variable-showcase">
+        <div class="variable-group">
+          <h4>🌞 Light Theme Variables</h4>
+          <div class="variable-item">
+            <span class="variable-name">--color-bg-primary</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#ffffff</span>
+              <div class="color-swatch" style="background: #ffffff;"></div>
+            </div>
+          </div>
+          <div class="variable-item">
+            <span class="variable-name">--color-bg-secondary</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#f8fafc</span>
+              <div class="color-swatch" style="background: #f8fafc;"></div>
+            </div>
+          </div>
+          <div class="variable-item">
+            <span class="variable-name">--color-text-primary</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#1e293b</span>
+              <div class="color-swatch" style="background: #1e293b;"></div>
+            </div>
+          </div>
+          <div class="variable-item">
+            <span class="variable-name">--color-accent</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#4f46e5</span>
+              <div class="color-swatch" style="background: #4f46e5;"></div>
+            </div>
+          </div>
+          <div class="variable-item">
+            <span class="variable-name">--color-success</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#10b981</span>
+              <div class="color-swatch" style="background: #10b981;"></div>
+            </div>
+          </div>
+          <div class="variable-item">
+            <span class="variable-name">--color-error</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#ef4444</span>
+              <div class="color-swatch" style="background: #ef4444;"></div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="variable-group">
+          <h4>🌙 Dark Theme Variables</h4>
+          <div class="variable-item">
+            <span class="variable-name">--color-bg-primary</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#1f2937</span>
+              <div class="color-swatch" style="background: #1f2937;"></div>
+            </div>
+          </div>
+          <div class="variable-item">
+            <span class="variable-name">--color-bg-secondary</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#374151</span>
+              <div class="color-swatch" style="background: #374151;"></div>
+            </div>
+          </div>
+          <div class="variable-item">
+            <span class="variable-name">--color-text-primary</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#f9fafb</span>
+              <div class="color-swatch" style="background: #f9fafb;"></div>
+            </div>
+          </div>
+          <div class="variable-item">
+            <span class="variable-name">--color-accent</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#6366f1</span>
+              <div class="color-swatch" style="background: #6366f1;"></div>
+            </div>
+          </div>
+          <div class="variable-item">
+            <span class="variable-name">--color-success</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#34d399</span>
+              <div class="color-swatch" style="background: #34d399;"></div>
+            </div>
+          </div>
+          <div class="variable-item">
+            <span class="variable-name">--color-error</span>
+            <div style="display: flex; align-items: center;">
+              <span class="variable-value">#f87171</span>
+              <div class="color-swatch" style="background: #f87171;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>🎯 Theme Configuration Examples</h2>
+      
+      <h3>Basic Theme Setup:</h3>
+      <div class="code-block">
+        // Light theme (default)<br>
+        const lightPlayground = new RestAPIClient({<br>
+        &nbsp;&nbsp;config: {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">theme: 'light'</span>,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;title: 'Light Theme API Tester'<br>
+        &nbsp;&nbsp;}<br>
+        });<br>
+        <br>
+        // Dark theme<br>
+        const darkPlayground = new RestAPIClient({<br>
+        &nbsp;&nbsp;config: {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">theme: 'dark'</span>,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;title: 'Dark Theme API Tester'<br>
+        &nbsp;&nbsp;}<br>
+        });
+      </div>
+      
+      <h3>Dynamic Theme Switching:</h3>
+      <div class="code-block">
+        // Initialize with light theme<br>
+        const playground = new RestAPIClient({<br>
+        &nbsp;&nbsp;config: { theme: 'light' }<br>
+        });<br>
+        <br>
+        // Switch to dark theme<br>
+        playground.<span class="highlight">updateConfig({ theme: 'dark' })</span>;<br>
+        <br>
+        // Switch back to light<br>
+        playground.<span class="highlight">updateConfig({ theme: 'light' })</span>;
+      </div>
+      
+      <h3>Combined with Other Options:</h3>
+      <div class="code-block">
+        const playground = new RestAPIClient({<br>
+        &nbsp;&nbsp;config: {<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;<span class="highlight">theme: 'dark'</span>,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;hideRequestPanel: true,<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;requestLabel: 'Query',<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;responseLabel: 'Data',<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;title: 'Dark GraphQL Explorer'<br>
+        &nbsp;&nbsp;}<br>
+        });
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>🔍 Component Theme Examples</h2>
+      
+      <div class="demo-grid">
+        <div class="demo-card">
+          <div class="demo-header">
+            <h4>☀️ Standard Light</h4>
+          </div>
+          <div id="standard-light" class="playground-mini"></div>
+        </div>
+        
+        <div class="demo-card">
+          <div class="demo-header">
+            <h4>🌙 Standard Dark</h4>
+          </div>
+          <div id="standard-dark" class="playground-mini"></div>
+        </div>
+        
+        <div class="demo-card">
+          <div class="demo-header">
+            <h4>☀️ Hidden Panel Light</h4>
+          </div>
+          <div id="hidden-light" class="playground-mini"></div>
+        </div>
+        
+        <div class="demo-card">
+          <div class="demo-header">
+            <h4>🌙 Hidden Panel Dark</h4>
+          </div>
+          <div id="hidden-dark" class="playground-mini"></div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>💻 Technical Implementation</h2>
+      
+      <h3>CSS Variables Definition:</h3>
+      <div class="code-block">
+        /* globals.css */<br>
+        :root {<br>
+        &nbsp;&nbsp;/* Light theme variables */<br>
+        &nbsp;&nbsp;--color-bg-primary: #ffffff;<br>
+        &nbsp;&nbsp;--color-text-primary: #1e293b;<br>
+        &nbsp;&nbsp;/* ... more variables */<br>
+        }<br>
+        <br>
+        .theme-dark {<br>
+        &nbsp;&nbsp;/* Dark theme overrides */<br>
+        &nbsp;&nbsp;--color-bg-primary: #1f2937;<br>
+        &nbsp;&nbsp;--color-text-primary: #f9fafb;<br>
+        &nbsp;&nbsp;/* ... more overrides */<br>
+        }
+      </div>
+      
+      <h3>Component Usage:</h3>
+      <div class="code-block">
+        /* Component CSS */<br>
+        .panel {<br>
+        &nbsp;&nbsp;background: <span class="highlight">var(--color-bg-primary)</span>;<br>
+        &nbsp;&nbsp;color: <span class="highlight">var(--color-text-primary)</span>;<br>
+        &nbsp;&nbsp;border: 1px solid <span class="highlight">var(--color-border-primary)</span>;<br>
+        &nbsp;&nbsp;box-shadow: <span class="highlight">var(--shadow-md)</span>;<br>
+        }
+      </div>
+      
+      <h3>Theme Class Application:</h3>
+      <div class="code-block">
+        // App.tsx<br>
+        return (<br>
+        &nbsp;&nbsp;&lt;div className={`app <span class="highlight">theme-${theme}</span>`}&gt;<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;{/* All child components inherit theme */}<br>
+        &nbsp;&nbsp;&lt;/div&gt;<br>
+        );
+      </div>
+    </div>
+    
+    <div class="section">
+      <h2>🌟 Benefits & Features</h2>
+      <ul>
+        <li><strong>🎨 Consistent Design:</strong> All components use the same color palette</li>
+        <li><strong>⚡ Performance:</strong> CSS variables are highly optimized</li>
+        <li><strong>🔧 Maintainable:</strong> Single source of truth for theme colors</li>
+        <li><strong>🎭 Flexible:</strong> Easy to add new themes or customize existing ones</li>
+        <li><strong>♿ Accessible:</strong> Proper contrast ratios for both themes</li>
+        <li><strong>📱 Responsive:</strong> Themes work across all screen sizes</li>
+        <li><strong>🔄 Dynamic:</strong> Switch themes without page reload</li>
+        <li><strong>🛠️ Developer-Friendly:</strong> TypeScript support with strict typing</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Library -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        // Standard Light
+        const standardLight = new RestAPIClient({
+          config: {
+            title: 'Light Theme',
+            theme: 'light',
+            showHeader: false,
+            showQuickStart: true,
+            defaultUrl: 'https://httpbin.org/get'
+          }
+        });
+        standardLight.init({ container: 'standard-light' });
+        
+        // Standard Dark
+        const standardDark = new RestAPIClient({
+          config: {
+            title: 'Dark Theme',
+            theme: 'dark',
+            showHeader: false,
+            showQuickStart: true,
+            defaultUrl: 'https://httpbin.org/uuid'
+          }
+        });
+        standardDark.init({ container: 'standard-dark' });
+        
+        // Hidden Panel Light
+        const hiddenLight = new RestAPIClient({
+          config: {
+            title: 'Hidden Panel Light',
+            theme: 'light',
+            showHeader: false,
+            hideRequestPanel: true,
+            defaultUrl: 'https://httpbin.org/json'
+          }
+        });
+        hiddenLight.init({ container: 'hidden-light' });
+        
+        // Hidden Panel Dark
+        const hiddenDark = new RestAPIClient({
+          config: {
+            title: 'Hidden Panel Dark',
+            theme: 'dark',
+            showHeader: false,
+            hideRequestPanel: true,
+            defaultUrl: 'https://httpbin.org/headers'
+          }
+        });
+        hiddenDark.init({ container: 'hidden-dark' });
+        
+        // Send initial requests
+        setTimeout(() => {
+          standardLight.sendRequest();
+          standardDark.sendRequest();
+          hiddenLight.sendRequest();
+          hiddenDark.sendRequest();
+        }, 1000);
+        
+      }, 100);
+    });
+  </script>
+</body>
+</html>

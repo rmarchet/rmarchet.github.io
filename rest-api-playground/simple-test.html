@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Test</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    #test { border: 1px solid #ddd; height: 400px; }
+  </style>
+</head>
+<body>
+  <h1>Simple RestAPIClient Test</h1>
+  <div id="test"></div>
+
+  <!-- React dependencies -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- Our library -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    console.log('React available:', typeof React);
+    console.log('ReactDOM available:', typeof ReactDOM);
+    console.log('Bundle loaded');
+    console.log('RestAPIClient available:', typeof RestAPIClient);
+    console.log('window.RestAPIClient available:', typeof window.RestAPIClient);
+    
+    if (typeof RestAPIClient !== 'undefined') {
+      try {
+        const client = new RestAPIClient();
+        console.log('Client created:', client);
+        client.init({ container: 'test' });
+        console.log('✅ Success!');
+      } catch (error) {
+        console.error('❌ Error:', error);
+      }
+    } else {
+      console.error('❌ RestAPIClient not found');
+    }
+  </script>
+</body>
+</html>

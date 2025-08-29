@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="./favicon.png" type="image/png" />
+  <link rel="shortcut icon" href="./favicon.ico" />
+  <title>REST API Playground - Timing Fix</title>
+</head>
+
+<body>
+  <div id="root"></div>
+  <noscript>
+    You need to enable JavaScript to run this app.
+  </noscript>
+  
+  <!-- React CDN for standalone usage -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Bundle -->
+  <script src="dist/bundle.js"></script>
+  
+  <!-- Fixed initialization with proper timing -->
+  <script>
+    const demo = new RestAPIClient({ 
+      config: {
+        title: 'REST API Playground',
+        subtitle: 'Test and explore REST APIs with ease',
+        showHeader: false,
+        defaultUrl: 'https://jsonplaceholder.typicode.com/posts/1'
+      }
+    });
+    
+    demo.init({ container: 'root' });
+    
+    // SOLUTION 1: Use setTimeout to wait for React component to mount
+    setTimeout(() => {
+      demo.sendRequest().then(response => {
+        console.log('✅ Request successful:', response);
+      }).catch(error => {
+        console.error('❌ Request failed:', error);
+      });
+    }, 100); // Small delay to ensure component is ready
+    
+    // SOLUTION 2: Alternative using the ready() method (once TypeScript builds)
+    // demo.ready().then(() => {
+    //   return demo.sendRequest();
+    // }).then(response => {
+    //   console.log('✅ Request successful:', response);
+    // }).catch(error => {
+    //   console.error('❌ Request failed:', error);
+    // });
+  </script>
+</body>
+
+</html>

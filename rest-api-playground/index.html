@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>REST API Playground Examples</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 40px auto; 
+      max-width: 800px;
+      background: #f5f5f5;
+      line-height: 1.6;
+    }
+    .container {
+      background: white;
+      border-radius: 12px;
+      padding: 30px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    }
+    h1 {
+      color: #333;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    .subtitle {
+      text-align: center;
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 18px;
+    }
+    .category {
+      margin: 30px 0;
+      padding: 20px;
+      border: 1px solid #e9ecef;
+      border-radius: 8px;
+      background: #f8f9fa;
+    }
+    .category h3 {
+      margin: 0 0 15px 0;
+      color: #495057;
+      border-bottom: 2px solid #007bff;
+      padding-bottom: 5px;
+    }
+    .examples-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+    }
+    .example-item {
+      background: white;
+      border: 1px solid #dee2e6;
+      border-radius: 6px;
+      padding: 15px;
+      transition: all 0.3s ease;
+    }
+    .example-item:hover {
+      border-color: #007bff;
+      box-shadow: 0 2px 8px rgba(0,123,255,0.15);
+      transform: translateY(-2px);
+    }
+    .example-link {
+      color: #007bff;
+      text-decoration: none;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    .example-link:hover {
+      text-decoration: underline;
+    }
+    .example-desc {
+      color: #6c757d;
+      font-size: 14px;
+      margin-top: 8px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      background: #e9ecef;
+      color: #495057;
+      border-radius: 12px;
+      font-size: 12px;
+      margin-top: 8px;
+    }
+    .badge.demo { background: #d4edda; color: #155724; }
+    .badge.test { background: #f8d7da; color: #721c24; }
+    .badge.config { background: #d1ecf1; color: #0c5460; }
+    .badge.api { background: #fff3cd; color: #856404; }
+    .badge.showcase { background: #e83e8c; color: white; }
+    .footer {
+      text-align: center;
+      margin-top: 40px;
+      padding-top: 20px;
+      border-top: 1px solid #e9ecef;
+      color: #6c757d;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🚀 REST API Playground Examples</h1>
+    <p class="subtitle">Interactive demonstrations and testing files</p>
+    
+    <div class="category">
+      <h3>🎮 Interactive Demos</h3>
+      <div class="examples-grid">
+        <div class="example-item">
+          <a href="basic-usage.html" class="example-link">Basic Usage</a>
+          <p class="example-desc">Learn fundamental usage patterns and configuration options</p>
+          <span class="badge demo">Demo</span>
+        </div>
+        <div class="example-item">
+          <a href="quickstart-demo.html" class="example-link">Quick Start Toggle</a>
+          <p class="example-desc">Interactive demonstration of the showQuickStart configuration</p>
+          <span class="badge demo">Demo</span>
+        </div>
+        <div class="example-item">
+          <a href="demo-config-examples.html" class="example-link">Configuration Showcase</a>
+          <p class="example-desc">Comprehensive examples of all configuration options</p>
+          <span class="badge config">Config</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="category">
+      <h3>🧪 API & Feature Testing</h3>
+      <div class="examples-grid">
+        <div class="example-item">
+          <a href="test-api-methods.html" class="example-link">API Methods</a>
+          <p class="example-desc">Interactive testing of all programmatic API methods</p>
+          <span class="badge api">API</span>
+        </div>
+        <div class="example-item">
+          <a href="test-async-api.html" class="example-link">Async API Testing</a>
+          <p class="example-desc">Testing async/await patterns and timing fixes</p>
+          <span class="badge test">Test</span>
+        </div>
+        <div class="example-item">
+          <a href="test-show-quickstart.html" class="example-link">Show Quick Start</a>
+          <p class="example-desc">Side-by-side comparison of showQuickStart configurations</p>
+          <span class="badge config">Config</span>
+        </div>
+        <div class="example-item">
+          <a href="test-collapsible-request.html" class="example-link">Collapsible Request Panel</a>
+          <p class="example-desc">Interactive demo of the collapsible Request panel feature</p>
+          <span class="badge demo">Demo</span>
+        </div>
+        <div class="example-item">
+          <a href="test-hidden-request-panel.html" class="example-link">Hidden Request Panel</a>
+          <p class="example-desc">Complete Request panel hiding with compact header info</p>
+          <span class="badge demo">Demo</span>
+        </div>
+        <div class="example-item">
+          <a href="test-custom-labels.html" class="example-link">Custom Panel Labels</a>
+          <p class="example-desc">Configure custom titles for Request and Response panels</p>
+          <span class="badge config">Config</span>
+        </div>
+        <div class="example-item">
+          <a href="test-themes.html" class="example-link">Light & Dark Themes</a>
+          <p class="example-desc">Interactive showcase of the CSS variables theme system</p>
+          <span class="badge demo">Demo</span>
+        </div>
+        <div class="example-item">
+          <a href="theme-comparison.html" class="example-link">Theme System Deep Dive</a>
+          <p class="example-desc">Comprehensive exploration of CSS variables and theme architecture</p>
+          <span class="badge tech">Tech</span>
+        </div>
+        <div class="example-item">
+          <a href="auto-theme-switcher.html" class="example-link">Auto Theme Switcher</a>
+          <p class="example-desc">Automatic theme switching based on time, system preferences, or intervals</p>
+          <span class="badge demo">Demo</span>
+        </div>
+        <div class="example-item">
+          <a href="test-header-component.html" class="example-link">Header Component Test</a>
+          <p class="example-desc">Testing the refactored Header component architecture</p>
+          <span class="badge tech">Tech</span>
+        </div>
+        <div class="example-item">
+          <a href="api-documentation-integration.html" class="example-link">API Documentation Integration</a>
+          <p class="example-desc">Complete example of playground embedded in API documentation</p>
+          <span class="badge showcase">Showcase</span>
+        </div>
+        <div class="example-item">
+          <a href="api-docs-sidebar-layout.html" class="example-link">API Docs Sidebar Layout</a>
+          <p class="example-desc">Two-column layout with docs on left and playgrounds on right</p>
+          <span class="badge showcase">Showcase</span>
+        </div>
+        <div class="example-item">
+          <a href="test-query-parameters.html" class="example-link">Query Parameters Test</a>
+          <p class="example-desc">Interactive test for theme and hideRequestPanel URL parameters</p>
+          <span class="badge test">Test</span>
+        </div>
+        <div class="example-item">
+          <a href="maxwidth-demo.html" class="example-link">MaxWidth Parameter Demo</a>
+          <p class="example-desc">Visual demonstration of different container widths and responsive behavior</p>
+          <span class="badge demo">Demo</span>
+        </div>
+        <div class="example-item">
+          <a href="branding-showcase.html" class="example-link">Branding Showcase</a>
+          <p class="example-desc">Real-world examples of custom labels for different industries</p>
+          <span class="badge showcase">Showcase</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="category">
+      <h3>🔬 Technical Testing</h3>
+      <div class="examples-grid">
+        <div class="example-item">
+          <a href="test-typescript.html" class="example-link">TypeScript Build</a>
+          <p class="example-desc">Validate TypeScript compilation and type safety</p>
+          <span class="badge test">Test</span>
+        </div>
+        <div class="example-item">
+          <a href="test-library.html" class="example-link">Library Test</a>
+          <p class="example-desc">Basic library functionality and instantiation testing</p>
+          <span class="badge test">Test</span>
+        </div>
+        <div class="example-item">
+          <a href="simple-test.html" class="example-link">Simple Test</a>
+          <p class="example-desc">Minimal test setup for quick validation</p>
+          <span class="badge test">Test</span>
+        </div>
+        <div class="example-item">
+          <a href="fix-timing-issue.html" class="example-link">Timing Fix</a>
+          <p class="example-desc">Demonstrates the timing issue fix with setTimeout workaround</p>
+          <span class="badge test">Test</span>
+        </div>
+      </div>
+    </div>
+    
+    <div class="footer">
+      <p><strong>💡 Getting Started:</strong> Try <a href="basic-usage.html">Basic Usage</a> first, then explore <a href="quickstart-demo.html">Quick Start Demo</a></p>
+      <p>All examples are self-contained and include the necessary dependencies</p>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Query Parameters Test - REST API Playground</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+      margin: 2rem;
+      background: #f8fafc;
+      color: #1e293b;
+    }
+    .test-links {
+      background: white;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+    .test-links h2 {
+      margin-top: 0;
+      color: #1f2937;
+    }
+    .test-link {
+      display: block;
+      padding: 0.75rem 1rem;
+      margin: 0.5rem 0;
+      background: #f1f5f9;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      text-decoration: none;
+      color: #4f46e5;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+    .test-link:hover {
+      background: #e2e8f0;
+      border-color: #4f46e5;
+      transform: translateY(-1px);
+    }
+    .playground-container {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      min-height: 500px;
+    }
+    .current-params {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .param {
+      font-family: 'Monaco', 'Menlo', monospace;
+      background: #1f2937;
+      color: #f9fafb;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="test-links">
+    <h2>🔗 Query Parameter Tests</h2>
+    <p>Click the links below to test different query parameter combinations:</p>
+    
+    <a href="?theme=dark" class="test-link">
+      🌙 Dark Theme: <span class="param">?theme=dark</span>
+    </a>
+    
+    <a href="?theme=light" class="test-link">
+      ☀️ Light Theme: <span class="param">?theme=light</span>
+    </a>
+    
+    <a href="?hideRequestPanel=true" class="test-link">
+      📱 Hide Request Panel: <span class="param">?hideRequestPanel=true</span>
+    </a>
+    
+    <a href="?theme=dark&hideRequestPanel=true" class="test-link">
+      🌙📱 Dark + Hidden Panel: <span class="param">?theme=dark&hideRequestPanel=true</span>
+    </a>
+    
+    <a href="?theme=light&hideRequestPanel=false" class="test-link">
+      ☀️📋 Light + Show Panel: <span class="param">?theme=light&hideRequestPanel=false</span>
+    </a>
+    
+    <a href="?maxWidth=800px" class="test-link">
+      📐 Max Width 800px: <span class="param">?maxWidth=800px</span>
+    </a>
+    
+    <a href="?maxWidth=600px&theme=dark" class="test-link">
+      📐🌙 Width 600px + Dark: <span class="param">?maxWidth=600px&theme=dark</span>
+    </a>
+    
+    <a href="?maxWidth=400px&hideRequestPanel=true" class="test-link">
+      📐📱 Width 400px + Hidden Panel: <span class="param">?maxWidth=400px&hideRequestPanel=true</span>
+    </a>
+    
+    <a href="?showHeader=false" class="test-link">
+      🚫📋 No Header: <span class="param">?showHeader=false</span>
+    </a>
+    
+    <a href="?maxWidth=500px&showHeader=false&hideRequestPanel=true&theme=dark" class="test-link">
+      🎛️ All Options Combined: <span class="param">?maxWidth=500px&showHeader=false&hideRequestPanel=true&theme=dark</span>
+    </a>
+  </div>
+
+  <div class="current-params">
+    <h3>📊 Current URL Parameters:</h3>
+    <div id="current-params-display"></div>
+  </div>
+
+  <div id="playground" class="playground-container"></div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Library -->
+  <script src="../dist/bundle.js"></script>
+  
+  <script>
+    // Fixed getParameterByName function
+    const getParameterByName = (name) => {
+      const url = window.location.href;
+      name = name.replace(/[\[\]]/g, '\\$&');
+      const regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)');
+      const results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, ' '));
+    }
+
+    // Display current parameters
+    function displayCurrentParams() {
+      const params = new URLSearchParams(window.location.search);
+      const paramsDiv = document.getElementById('current-params-display');
+      
+      if (params.toString()) {
+        let html = '<ul>';
+        for (const [key, value] of params) {
+          html += `<li><strong>${key}:</strong> <span class="param">${value}</span></li>`;
+        }
+        html += '</ul>';
+        paramsDiv.innerHTML = html;
+      } else {
+        paramsDiv.innerHTML = '<em>No query parameters in current URL</em>';
+      }
+    }
+
+    window.addEventListener('load', () => {
+      displayCurrentParams();
+      
+      setTimeout(() => {
+        // Get query parameters
+        const theme = getParameterByName('theme') || 'light';
+        const hideRequestPanel = getParameterByName('hideRequestPanel') === 'true';
+        const showHeader = getParameterByName('showHeader') !== 'false';
+        const maxWidth = getParameterByName('maxWidth');
+        
+        console.log('Query Parameters:', { theme, hideRequestPanel, showHeader, maxWidth });
+        
+        // Apply maxWidth parameter to playground container
+        if (maxWidth) {
+          const playgroundEl = document.getElementById('playground');
+          playgroundEl.style.maxWidth = maxWidth;
+          playgroundEl.style.margin = '0 auto';
+        }
+        
+        // Initialize playground with query parameters
+        const playground = new RestAPIClient({
+          config: {
+            theme: theme,
+            showHeader: showHeader,
+            hideRequestPanel: hideRequestPanel,
+            title: 'Query Parameters Test',
+            subtitle: `Theme: ${theme} | Header: ${showHeader ? 'Visible' : 'Hidden'} | Request Panel: ${hideRequestPanel ? 'Hidden' : 'Visible'}${maxWidth ? ` | Max Width: ${maxWidth}` : ''}`,
+            defaultUrl: 'https://jsonplaceholder.typicode.com/posts/1'
+          }
+        });
+        
+        playground.init({ container: 'playground' });
+        
+        // Auto-send request after initialization
+        playground.ready().then(() => {
+          playground.sendRequest();
+        });
+        
+      }, 100);
+    });
+  </script>
+</body>
+</html>

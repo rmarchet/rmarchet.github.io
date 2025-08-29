@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto Theme Switcher</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .controls {
+      background: #e3f2fd;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+      text-align: center;
+    }
+    .controls h3 {
+      margin: 0 0 15px 0;
+    }
+    .button-group {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .demo-btn {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s ease;
+    }
+    .demo-btn:hover {
+      background: #0056b3;
+    }
+    .demo-btn.active {
+      background: #28a745;
+    }
+    .playground-container {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      min-height: 500px;
+      margin: 20px 0;
+    }
+    .status {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 6px;
+      margin: 15px 0;
+      font-family: monospace;
+      font-size: 14px;
+    }
+    .feature-list {
+      background: #d4edda;
+      padding: 20px;
+      border-radius: 8px;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔄 Auto Theme Switcher Demo</h1>
+    <p><strong>Demonstrates automatic theme switching based on various conditions</strong></p>
+    
+    <div class="feature-list">
+      <h3>🌟 Auto-switching Features:</h3>
+      <ul>
+        <li><strong>🕐 Time-based:</strong> Automatically switch based on time of day</li>
+        <li><strong>💻 System Preference:</strong> Follow user's OS dark mode setting</li>
+        <li><strong>⏱️ Timed Intervals:</strong> Cycle between themes every few seconds</li>
+        <li><strong>🎲 Random:</strong> Randomly switch themes</li>
+        <li><strong>🖱️ Manual Control:</strong> Override auto-switching with manual selection</li>
+      </ul>
+    </div>
+    
+    <div class="controls">
+      <h3>🎛️ Auto-Switching Modes</h3>
+      <div class="button-group">
+        <button id="manual-btn" class="demo-btn active" onclick="setAutoMode('manual')">
+          ✋ Manual Control
+        </button>
+        <button id="system-btn" class="demo-btn" onclick="setAutoMode('system')">
+          💻 System Preference
+        </button>
+        <button id="time-btn" class="demo-btn" onclick="setAutoMode('time')">
+          🕐 Time-based (Day/Night)
+        </button>
+        <button id="interval-btn" class="demo-btn" onclick="setAutoMode('interval')">
+          ⏱️ Timed Cycling (5s)
+        </button>
+        <button id="random-btn" class="demo-btn" onclick="setAutoMode('random')">
+          🎲 Random (3s)
+        </button>
+      </div>
+      
+      <div style="margin-top: 15px;">
+        <button class="demo-btn" onclick="switchToLight()" style="background: #ffc107; color: #212529;">
+          ☀️ Force Light
+        </button>
+        <button class="demo-btn" onclick="switchToDark()" style="background: #6c757d;">
+          🌙 Force Dark
+        </button>
+      </div>
+    </div>
+    
+    <div class="status" id="status">
+      <strong>Status:</strong> Manual control mode - Click theme buttons above to switch
+    </div>
+    
+    <div id="playground" class="playground-container"></div>
+    
+    <div class="feature-list">
+      <h3>💡 Implementation Examples:</h3>
+      
+      <h4>System Preference Detection:</h4>
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 14px;">
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;<br>
+        const theme = prefersDark ? 'dark' : 'light';<br>
+        playground.updateConfig({ theme });
+      </div>
+      
+      <h4>Time-based Switching:</h4>
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 14px;">
+        const hour = new Date().getHours();<br>
+        const theme = (hour >= 18 || hour <= 6) ? 'dark' : 'light';<br>
+        playground.updateConfig({ theme });
+      </div>
+      
+      <h4>Auto-switching with Intervals:</h4>
+      <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; font-family: monospace; font-size: 14px;">
+        setInterval(() => {<br>
+        &nbsp;&nbsp;const themes = ['light', 'dark'];<br>
+        &nbsp;&nbsp;const randomTheme = themes[Math.floor(Math.random() * themes.length)];<br>
+        &nbsp;&nbsp;playground.updateConfig({ theme: randomTheme });<br>
+        }, 5000);
+      </div>
+    </div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Library -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    let playground = null;
+    let autoInterval = null;
+    let currentMode = 'manual';
+    
+    function updateStatus(message) {
+      document.getElementById('status').innerHTML = `<strong>Status:</strong> ${message}`;
+    }
+    
+    function setActiveButton(mode) {
+      // Remove active class from all buttons
+      document.querySelectorAll('.demo-btn').forEach(btn => btn.classList.remove('active'));
+      // Add active class to current mode button
+      document.getElementById(`${mode}-btn`).classList.add('active');
+    }
+    
+    function clearAutoMode() {
+      if (autoInterval) {
+        clearInterval(autoInterval);
+        autoInterval = null;
+      }
+    }
+    
+    function setAutoMode(mode) {
+      clearAutoMode();
+      currentMode = mode;
+      setActiveButton(mode);
+      
+      switch (mode) {
+        case 'manual':
+          updateStatus('Manual control mode - Click theme buttons above to switch');
+          break;
+          
+        case 'system':
+          const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          const systemTheme = prefersDark ? 'dark' : 'light';
+          playground.updateConfig({ theme: systemTheme });
+          updateStatus(`System preference mode - Using ${systemTheme} theme based on OS setting`);
+          
+          // Listen for system preference changes
+          window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (currentMode === 'system') {
+              const newTheme = e.matches ? 'dark' : 'light';
+              playground.updateConfig({ theme: newTheme });
+              updateStatus(`System preference changed - Switched to ${newTheme} theme`);
+            }
+          });
+          break;
+          
+        case 'time':
+          function updateTimeBasedTheme() {
+            const hour = new Date().getHours();
+            const theme = (hour >= 18 || hour <= 6) ? 'dark' : 'light';
+            playground.updateConfig({ theme });
+            updateStatus(`Time-based mode - ${hour}:00, using ${theme} theme (dark: 6PM-6AM)`);
+          }
+          updateTimeBasedTheme();
+          autoInterval = setInterval(updateTimeBasedTheme, 60000); // Check every minute
+          break;
+          
+        case 'interval':
+          let cycleTheme = 'light';
+          function cycleBetweenThemes() {
+            cycleTheme = cycleTheme === 'light' ? 'dark' : 'light';
+            playground.updateConfig({ theme: cycleTheme });
+            updateStatus(`Timed cycling mode - Switched to ${cycleTheme} theme (changes every 5 seconds)`);
+          }
+          autoInterval = setInterval(cycleBetweenThemes, 5000);
+          updateStatus('Timed cycling mode - Switching between themes every 5 seconds');
+          break;
+          
+        case 'random':
+          function randomThemeSwitch() {
+            const themes = ['light', 'dark'];
+            const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+            playground.updateConfig({ theme: randomTheme });
+            updateStatus(`Random mode - Switched to ${randomTheme} theme (changes every 3 seconds)`);
+          }
+          autoInterval = setInterval(randomThemeSwitch, 3000);
+          updateStatus('Random mode - Randomly switching themes every 3 seconds');
+          break;
+      }
+    }
+    
+    function switchToLight() {
+      playground.updateConfig({ theme: 'light' });
+      updateStatus('Manually switched to light theme');
+    }
+    
+    function switchToDark() {
+      playground.updateConfig({ theme: 'dark' });
+      updateStatus('Manually switched to dark theme');
+    }
+    
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        playground = new RestAPIClient({
+          config: {
+            title: 'Auto Theme Switcher Demo',
+            subtitle: 'Watch the theme change automatically!',
+            theme: 'light',
+            showHeader: true,
+            showQuickStart: true,
+            defaultUrl: 'https://httpbin.org/get'
+          }
+        });
+        
+        playground.init({ container: 'playground' });
+        
+        // Send initial request
+        setTimeout(() => {
+          playground.sendRequest();
+        }, 1000);
+        
+      }, 100);
+    });
+    
+    // Cleanup on page unload
+    window.addEventListener('beforeunload', () => {
+      clearAutoMode();
+    });
+  </script>
+</body>
+</html>

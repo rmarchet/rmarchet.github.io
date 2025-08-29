@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collapsible Request Panel Test</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .demo-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+    }
+    .playground-container {
+      border: 2px solid #e9ecef;
+      border-radius: 8px;
+      min-height: 500px;
+      margin: 15px 0;
+    }
+    .feature-list {
+      background: #f8f9fa;
+      padding: 20px;
+      border-radius: 6px;
+      margin: 20px 0;
+    }
+    .feature-list h3 {
+      margin: 0 0 15px 0;
+      color: #495057;
+    }
+    .feature-list ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+    .feature-list li {
+      margin: 8px 0;
+      color: #6c757d;
+    }
+    .highlight {
+      background: #fff3cd;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-weight: bold;
+      color: #856404;
+    }
+    .instructions {
+      background: #d1ecf1;
+      padding: 15px;
+      border-radius: 6px;
+      border-left: 4px solid #0c5460;
+      margin: 20px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🔧 Collapsible Request Panel</h1>
+    <p><strong>Test the new collapsible functionality for the Request panel</strong></p>
+    
+    <div class="instructions">
+      <h3>📋 How to Test:</h3>
+      <ol>
+        <li>Look for the <span class="highlight">chevron button</span> in the Request panel header</li>
+        <li>Click the button to see the Request panel <span class="highlight">narrow to ~180px width</span></li>
+        <li>Notice how the <span class="highlight">Response panel expands</span> to take the extra space</li>
+        <li>Observe the <span class="highlight">smooth width transition</span> with CSS animations</li>
+        <li>See how the <span class="highlight">title centers</span> and Quick Start hides when collapsed</li>
+        <li>Click again to expand back to <span class="highlight">50/50 layout</span></li>
+      </ol>
+    </div>
+    
+    <div class="feature-list">
+      <h3>✨ Key Features:</h3>
+      <ul>
+        <li><strong>Width Reduction:</strong> Panel narrows from 50% to ~180px when collapsed</li>
+        <li><strong>Responsive Layout:</strong> Grid layout changes from "1fr 1fr" to "auto 1fr"</li>
+        <li><strong>Smooth Transitions:</strong> 0.3s CSS animations for all width changes</li>
+        <li><strong>Space Maximization:</strong> Response panel gets 70%+ more space</li>
+        <li><strong>Smart Header:</strong> Title centers and Quick Start auto-hides</li>
+        <li><strong>State Preservation:</strong> All request data remains intact</li>
+        <li><strong>Accessibility:</strong> ARIA labels and keyboard support</li>
+      </ul>
+    </div>
+    
+    <div class="demo-section">
+      <h3>🎮 Interactive Demo</h3>
+      <p>The playground below demonstrates the width-changing collapsible Request panel. Watch how the layout adapts!</p>
+      
+      <div style="background: #e3f2fd; padding: 15px; border-radius: 6px; margin: 15px 0; font-size: 14px;">
+        <strong>💡 Layout Changes:</strong><br>
+        <strong>Expanded:</strong> Request 50% | Response 50%<br>
+        <strong>Collapsed:</strong> Request ~180px | Response ~remaining space
+      </div>
+      
+      <div id="playground" class="playground-container"></div>
+    </div>
+    
+    <div class="demo-section">
+      <h3>🎯 Use Cases:</h3>
+      <ul>
+        <li><strong>Focus Mode:</strong> Collapse Request panel to focus on Response analysis</li>
+        <li><strong>Small Screens:</strong> Better mobile/tablet experience with space management</li>
+        <li><strong>Workflow Optimization:</strong> Hide completed request setup to focus on results</li>
+        <li><strong>Teaching/Demos:</strong> Show/hide sections as needed during presentations</li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Library -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        const demo = new RestAPIClient({
+          config: {
+            title: '🔧 Collapsible Request Panel Demo',
+            subtitle: 'Try collapsing the Request panel below!',
+            showHeader: true,
+            showQuickStart: true,
+            defaultUrl: 'https://httpbin.org/get'
+          }
+        });
+        
+        demo.init({ container: 'playground' });
+        
+        // Send an initial request to populate the response
+        setTimeout(() => {
+          demo.sendRequest().then(response => {
+            console.log('✅ Initial request completed:', response);
+          }).catch(error => {
+            console.error('❌ Initial request failed:', error);
+          });
+        }, 500);
+      }, 100);
+    });
+  </script>
+</body>
+</html>

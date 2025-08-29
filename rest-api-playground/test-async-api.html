@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Async API Test - No More Timing Issues!</title>
+  <style>
+    body { 
+      font-family: Arial, sans-serif; 
+      margin: 20px; 
+      background: #f5f5f5;
+    }
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    .test-section {
+      margin: 20px 0;
+      padding: 15px;
+      border: 1px solid #e9ecef;
+      border-radius: 6px;
+    }
+    .status {
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 4px;
+      font-family: monospace;
+    }
+    .success { background: #d4edda; color: #155724; }
+    .error { background: #f8d7da; color: #721c24; }
+    .info { background: #d1ecf1; color: #0c5460; }
+    button {
+      margin: 5px;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      background: #007bff;
+      color: white;
+    }
+    button:hover { background: #0056b3; }
+    button:disabled { background: #6c757d; cursor: not-allowed; }
+    #playground { 
+      border: 2px solid #e9ecef; 
+      border-radius: 8px; 
+      min-height: 400px; 
+      margin-top: 20px;
+    }
+    .code {
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 14px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🎯 Async API Test - Fixed Timing Issues!</h1>
+    <p><strong>Testing the new promise-based API that automatically waits for component readiness.</strong></p>
+    
+    <div class="test-section">
+      <h3>✅ Problem Solved:</h3>
+      <div class="code">
+        // OLD WAY (had timing issues):
+        demo.init({ container: 'root' });
+        demo.sendRequest(); // ❌ Error: init() must be called before using API methods
+        
+        // NEW WAY (perfect timing):
+        demo.init({ container: 'root' });
+        demo.sendRequest(); // ✅ Automatically waits for component to be ready!
+      </div>
+    </div>
+    
+    <div class="test-section">
+      <h3>🧪 Interactive Tests:</h3>
+      <button onclick="testSendRequest()">Test sendRequest()</button>
+      <button onclick="testSetRequest()">Test setRequest()</button>
+      <button onclick="testGetState()">Test getRequest/getResponse()</button>
+      <button onclick="testChainedCalls()">Test Chained API Calls</button>
+      <button onclick="testReady()">Test ready() Promise</button>
+      <div id="test-results"></div>
+    </div>
+    
+    <div id="playground"></div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Library -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    let demo = null;
+    
+    function updateResults(message, type = 'info') {
+      const resultsEl = document.getElementById('test-results');
+      const status = document.createElement('div');
+      status.className = `status ${type}`;
+      status.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+      resultsEl.appendChild(status);
+      console.log(`[${type.toUpperCase()}]`, message);
+    }
+
+    // Initialize the playground
+    function initializePlayground() {
+      updateResults('🚀 Initializing RestAPIClient...', 'info');
+      
+      demo = new RestAPIClient({
+        config: {
+          title: '🧪 Async API Test',
+          subtitle: 'No more timing issues!',
+          showHeader: true,
+          defaultUrl: 'https://httpbin.org/get'
+        }
+      });
+      
+      demo.init({ container: 'playground' });
+      updateResults('✅ Playground initialized successfully!', 'success');
+    }
+
+    // Test sendRequest immediately after init (this was the original problem)
+    async function testSendRequest() {
+      try {
+        updateResults('🔄 Testing sendRequest() - should work immediately...', 'info');
+        const response = await demo.sendRequest();
+        updateResults(`✅ sendRequest() success! Status: ${response.status} (${response.time}ms)`, 'success');
+      } catch (error) {
+        updateResults(`❌ sendRequest() failed: ${error.message}`, 'error');
+      }
+    }
+
+    // Test setRequest method
+    async function testSetRequest() {
+      try {
+        updateResults('🔄 Testing setRequest() method...', 'info');
+        await demo.setRequest({
+          url: 'https://httpbin.org/json',
+          method: 'GET',
+          headers: [
+            { key: 'Accept', value: 'application/json' },
+            { key: 'X-Test', value: 'async-api' }
+          ]
+        });
+        updateResults('✅ setRequest() completed successfully!', 'success');
+      } catch (error) {
+        updateResults(`❌ setRequest() failed: ${error.message}`, 'error');
+      }
+    }
+
+    // Test state access methods
+    async function testGetState() {
+      try {
+        updateResults('🔄 Testing getRequest() and getResponse()...', 'info');
+        const request = await demo.getRequest();
+        const response = await demo.getResponse();
+        updateResults(`✅ State access successful! URL: ${request.url}`, 'success');
+        if (response) {
+          updateResults(`✅ Last response status: ${response.status}`, 'success');
+        }
+      } catch (error) {
+        updateResults(`❌ State access failed: ${error.message}`, 'error');
+      }
+    }
+
+    // Test chained API calls
+    async function testChainedCalls() {
+      try {
+        updateResults('🔄 Testing chained API calls...', 'info');
+        
+        // Chain multiple operations
+        await demo.setRequest({
+          url: 'https://httpbin.org/uuid',
+          method: 'GET'
+        });
+        
+        const response = await demo.sendRequest();
+        const currentRequest = await demo.getRequest();
+        
+        updateResults(`✅ Chained calls successful! URL: ${currentRequest.url}, Status: ${response.status}`, 'success');
+      } catch (error) {
+        updateResults(`❌ Chained calls failed: ${error.message}`, 'error');
+      }
+    }
+
+    // Test the ready() promise directly
+    async function testReady() {
+      try {
+        updateResults('🔄 Testing ready() promise...', 'info');
+        await demo.ready();
+        updateResults('✅ ready() promise resolved - component is ready!', 'success');
+      } catch (error) {
+        updateResults(`❌ ready() promise failed: ${error.message}`, 'error');
+      }
+    }
+
+    // Auto-initialize on page load
+    window.addEventListener('load', () => {
+      initializePlayground();
+      
+      // Test immediate API call (the original problem)
+      setTimeout(() => {
+        updateResults('🎯 Testing the fix: calling sendRequest() immediately after init...', 'info');
+        testSendRequest();
+      }, 100);
+    });
+  </script>
+</body>
+</html>
