@@ -7,8 +7,33 @@
   <style>
     body { 
       font-family: Arial, sans-serif; 
-      margin: 20px; 
+      margin: 0; 
       background: #f5f5f5;
+    }
+    .nav-header {
+      background: #4f46e5;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .nav-header a {
+      color: white;
+      text-decoration: none;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.3s;
+      font-weight: 500;
+    }
+    .nav-header a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .content {
+      margin: 0;
     }
     .container {
       max-width: 1400px;
@@ -98,7 +123,13 @@
   </style>
 </head>
 <body>
-  <div class="container">
+
+  <div class="nav-header">
+    <a href="index.html">← Back to Examples</a>
+    <span>Custom Panel Labels Test</span>
+  </div>
+  
+  <div class="content"><div class="container">
     <h1>🏷️ Custom Panel Labels Configuration</h1>
     <p><strong>Test the new requestLabel and responseLabel configuration options</strong></p>
     
@@ -354,4 +385,5 @@
     });
   </script>
 </body>
+  </div>
 </html>

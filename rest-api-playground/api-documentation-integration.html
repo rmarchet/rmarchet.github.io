@@ -17,6 +17,31 @@
       color: #333;
       background: #fafbfc;
     }
+    .nav-header {
+      background: #4f46e5;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .nav-header a {
+      color: white;
+      text-decoration: none;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.3s;
+      font-weight: 500;
+    }
+    .nav-header a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .content {
+      margin: 0;
+    }
     
     .header {
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -286,7 +311,13 @@
   </style>
 </head>
 <body>
-  <div class="header">
+
+  <div class="nav-header">
+    <a href="index.html">← Back to Examples</a>
+    <span>User Management API Documentation</span>
+  </div>
+  
+  <div class="content"><div class="header">
     <div class="container">
       <h1>User Management API</h1>
       <p>Complete REST API for user registration, authentication, and profile management</p>
@@ -738,4 +769,5 @@
     });
   </script>
 </body>
+  </div>
 </html>

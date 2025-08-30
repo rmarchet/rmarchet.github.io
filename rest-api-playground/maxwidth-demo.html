@@ -8,9 +8,34 @@
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
       margin: 0;
-      padding: 2rem;
+      padding: 0;
       background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
       min-height: 100vh;
+    }
+    .nav-header {
+      background: rgba(0,0,0,0.2);
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(10px);
+    }
+    .nav-header a {
+      color: white;
+      text-decoration: none;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.3s;
+      font-weight: 500;
+    }
+    .nav-header a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .content {
+      padding: 0 2rem 2rem 2rem;
     }
     
     .demo-header {
@@ -100,7 +125,13 @@
   </style>
 </head>
 <body>
-  <div class="demo-header">
+  <div class="nav-header">
+    <a href="index.html">← Back to Examples</a>
+    <span>MaxWidth Parameter Demo</span>
+  </div>
+  
+  <div class="content">
+    <div class="demo-header">
     <h1>📐 MaxWidth Parameter Demo</h1>
     <p>Test how the REST API Playground adapts to different container widths</p>
   </div>
@@ -147,7 +178,8 @@
     Current Container Width: Loading...
   </div>
 
-  <div id="playground" class="playground-container"></div>
+    <div id="playground" class="playground-container"></div>
+  </div>
 
   <!-- React CDN -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>

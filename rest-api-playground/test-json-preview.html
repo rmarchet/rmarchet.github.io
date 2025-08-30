@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="../public/favicon.png" type="image/png" />
+  <title>JSON Preview Demo - REST API Playground</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    
+    .nav-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .nav-header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    
+    .nav-header a {
+      color: white;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    
+    .nav-header a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .demo-section {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .demo-section h2 {
+      margin-top: 0;
+      color: #374151;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 0.5rem;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .nav-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-list li {
+      padding: 0.5rem 0;
+      display: flex;
+      align-items: center;
+    }
+
+    .feature-list li:before {
+      content: "✅";
+      margin-right: 0.5rem;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="nav-header">
+    <h1>🔍 Enhanced JSON Preview Demo</h1>
+    <a href="index.html">← Back to Examples</a>
+  </div>
+
+  <div class="demo-section">
+    <h2>📊 JSON Preview with react-json-view</h2>
+    <p>This demo showcases the enhanced JSON preview functionality using <code>react-json-view</code>, which provides a much better experience than the previous lite version.</p>
+    
+    <h3>🎯 Features Demonstrated:</h3>
+    <ul class="feature-list">
+      <li>Interactive JSON tree with expand/collapse</li>
+      <li>Copy to clipboard functionality</li>
+      <li>Object size indicators</li>
+      <li>Beautiful syntax highlighting</li>
+      <li>Theme integration (light/dark)</li>
+      <li>Better handling of complex nested data</li>
+    </ul>
+  </div>
+
+  <div class="demo-grid">
+    <div>
+      <div class="demo-section">
+        <h3>🌟 JSON API - Complex Data</h3>
+        <p>Test with a complex JSON response from JSONPlaceholder to see the interactive tree view.</p>
+        <div id="json-playground"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="demo-section">
+        <h3>🖼️ Image API - Visual Preview</h3>
+        <p>Test with an image URL to see how the preview tab automatically detects and displays images.</p>
+        <div id="image-playground"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="demo-section">
+    <h3>🎨 Dark Theme Example</h3>
+    <p>The JSON viewer automatically adapts to your app's theme. This example shows dark theme integration.</p>
+    <div id="dark-playground"></div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Bundle -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    async function init() {
+      // Complex JSON API example
+      const jsonDemo = new RestAPIClient({
+        config: {
+          theme: 'light',
+          showHeader: false,
+          hideRequestPanel: true,
+          responseLabel: 'JSON Response'
+        }
+      });
+      jsonDemo.init({ container: 'json-playground' });
+      
+      // Pre-load a complex JSON response
+      setTimeout(() => {
+        jsonDemo.sendRequest({
+          url: 'https://jsonplaceholder.typicode.com/users/1',
+          method: 'GET'
+        });
+      }, 500);
+
+      // Image API example
+      const imageDemo = new RestAPIClient({
+        config: {
+          theme: 'light',
+          showHeader: false,
+          hideRequestPanel: true,
+          responseLabel: 'Image Preview'
+        }
+      });
+      imageDemo.init({ container: 'image-playground' });
+      
+      // Pre-load an image
+      setTimeout(() => {
+        imageDemo.sendRequest({
+          url: 'https://picsum.photos/400/300',
+          method: 'GET'
+        });
+      }, 700);
+
+      // Dark theme example
+      const darkDemo = new RestAPIClient({
+        config: {
+          theme: 'dark',
+          showHeader: false,
+          hideRequestPanel: true,
+          responseLabel: 'Dark Theme JSON'
+        }
+      });
+      darkDemo.init({ container: 'dark-playground' });
+      
+      // Pre-load JSON in dark theme
+      setTimeout(() => {
+        darkDemo.sendRequest({
+          url: 'https://jsonplaceholder.typicode.com/posts/1/comments',
+          method: 'GET'
+        });
+      }, 900);
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>

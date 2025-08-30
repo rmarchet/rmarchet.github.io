@@ -5,7 +5,32 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>RestAPIClient Library Test</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
+    body { font-family: Arial, sans-serif; margin: 0; }
+    .nav-header {
+      background: #4f46e5;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .nav-header a {
+      color: white;
+      text-decoration: none;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.3s;
+      font-weight: 500;
+    }
+    .nav-header a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .content {
+      margin: 0;
+    }
     .test-container { 
       max-width: 1200px; 
       margin: 0 auto; 
@@ -16,7 +41,13 @@
   </style>
 </head>
 <body>
-  <h1>RestAPIClient Library Test</h1>
+
+  <div class="nav-header">
+    <a href="index.html">← Back to Examples</a>
+    <span>RestAPIClient Library Test</span>
+  </div>
+  
+  <div class="content"><h1>RestAPIClient Library Test</h1>
   <p>Testing the library build and API</p>
   
   <div id="test-container" class="test-container"></div>
@@ -62,8 +93,9 @@
       
     } catch (error) {
       console.error('❌ Library test failed:', error);
-      document.body.innerHTML += '<div style="color: red; padding: 20px; border: 1px solid red; margin: 20px;">Error: ' + error.message + '</div>';
+      document.body.innerHTML += '<div style="color: red; padding: 20px; border: 1px solid red; margin: 0;">Error: ' + error.message + '</div>';
     }
   </script>
 </body>
+  </div>
 </html>

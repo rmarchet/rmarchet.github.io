@@ -18,6 +18,31 @@
       background: #f9fafb;
     }
     
+    .nav-header {
+      background: #6366f1;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+    .nav-header a {
+      color: white;
+      text-decoration: none;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.3s;
+      font-weight: 500;
+    }
+    .nav-header a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    
     .header {
       background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
       color: white;
@@ -350,6 +375,11 @@
   </style>
 </head>
 <body>
+  <div class="nav-header">
+    <a href="index.html">← Back to Examples</a>
+    <span>API Documentation Sidebar Layout</span>
+  </div>
+  
   <header class="header">
     <div class="header-content">
       <h1>💳 Payment API Documentation</h1>
@@ -396,7 +426,7 @@
       <p>The Payment API uses API keys for authentication. Include your secret API key in the Authorization header using Bearer authentication.</p>
       
       <div class="code-block">
-Authorization: Bearer sk_test_4eC39HqLyjWDarjtT1zdp7dc
+Authorization: Bearer your_api_key_here
       </div>
       
       <h3>API Keys</h3>
@@ -410,23 +440,23 @@ Authorization: Bearer sk_test_4eC39HqLyjWDarjtT1zdp7dc
             <th>Purpose</th>
           </tr>
         </thead>
-        <tbody>
-          <tr>
-            <td><code>sk_test_...</code></td>
-            <td>Secret Key</td>
-            <td>Server-side development and testing</td>
-          </tr>
-          <tr>
-            <td><code>pk_test_...</code></td>
-            <td>Publishable Key</td>
-            <td>Client-side development and testing</td>
-          </tr>
-          <tr>
-            <td><code>sk_live_...</code></td>
-            <td>Live Secret Key</td>
-            <td>Production server-side operations</td>
-          </tr>
-        </tbody>
+                  <tbody>
+            <tr>
+              <td><code>api_test_...</code></td>
+              <td>Test Secret Key</td>
+              <td>Server-side development and testing</td>
+            </tr>
+            <tr>
+              <td><code>api_pub_...</code></td>
+              <td>Publishable Key</td>
+              <td>Client-side development and testing</td>
+            </tr>
+            <tr>
+              <td><code>api_live_...</code></td>
+              <td>Live Secret Key</td>
+              <td>Production server-side operations</td>
+            </tr>
+          </tbody>
       </table>
     </section>
     
@@ -690,7 +720,7 @@ Authorization: Bearer sk_test_4eC39HqLyjWDarjtT1zdp7dc
             method: 'POST',
             headers: [
               { key: 'Content-Type', value: 'application/json' },
-              { key: 'Authorization', value: 'Bearer sk_test_4eC39HqLyjWDarjtT1zdp7dc' }
+              { key: 'Authorization', value: 'Bearer your_api_key_here' }
             ],
             body: JSON.stringify({
               amount: 2500,
@@ -720,7 +750,7 @@ Authorization: Bearer sk_test_4eC39HqLyjWDarjtT1zdp7dc
             url: 'https://jsonplaceholder.typicode.com/posts/1',
             method: 'GET',
             headers: [
-              { key: 'Authorization', value: 'Bearer sk_test_4eC39HqLyjWDarjtT1zdp7dc' }
+              { key: 'Authorization', value: 'Bearer your_api_key_here' }
             ],
             body: ''
           });
@@ -744,7 +774,7 @@ Authorization: Bearer sk_test_4eC39HqLyjWDarjtT1zdp7dc
             url: 'https://jsonplaceholder.typicode.com/posts?_limit=5',
             method: 'GET',
             headers: [
-              { key: 'Authorization', value: 'Bearer sk_test_4eC39HqLyjWDarjtT1zdp7dc' }
+              { key: 'Authorization', value: 'Bearer your_api_key_here' }
             ],
             body: ''
           });
@@ -769,7 +799,7 @@ Authorization: Bearer sk_test_4eC39HqLyjWDarjtT1zdp7dc
             method: 'POST',
             headers: [
               { key: 'Content-Type', value: 'application/json' },
-              { key: 'Authorization', value: 'Bearer sk_test_4eC39HqLyjWDarjtT1zdp7dc' }
+              { key: 'Authorization', value: 'Bearer your_api_key_here' }
             ],
             body: JSON.stringify({
               amount: 1000,

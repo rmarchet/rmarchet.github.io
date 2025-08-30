@@ -7,9 +7,34 @@
   <style>
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-      margin: 2rem;
+      margin: 0;
       background: #f8fafc;
       color: #1e293b;
+    }
+    .nav-header {
+      background: #4f46e5;
+      color: white;
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .nav-header a {
+      color: white;
+      text-decoration: none;
+      background: rgba(255,255,255,0.2);
+      padding: 6px 12px;
+      border-radius: 6px;
+      transition: background 0.3s;
+      font-weight: 500;
+    }
+    .nav-header a:hover {
+      background: rgba(255,255,255,0.3);
+    }
+    .content {
+      margin: 2rem;
     }
     .test-links {
       background: white;
@@ -63,7 +88,13 @@
   </style>
 </head>
 <body>
-  <div class="test-links">
+  <div class="nav-header">
+    <a href="index.html">← Back to Examples</a>
+    <span>Query Parameters Test</span>
+  </div>
+  
+  <div class="content">
+    <div class="test-links">
     <h2>🔗 Query Parameter Tests</h2>
     <p>Click the links below to test different query parameter combinations:</p>
     
@@ -113,7 +144,8 @@
     <div id="current-params-display"></div>
   </div>
 
-  <div id="playground" class="playground-container"></div>
+    <div id="playground" class="playground-container"></div>
+  </div>
 
   <!-- React CDN -->
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
