@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CDN Usage Examples - REST API Playground</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+      margin: 0;
+      padding: 20px;
+      background-color: #f8fafc;
+      color: #1e293b;
+      line-height: 1.6;
+    }
+    
+    .nav-header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 1rem 2rem;
+      border-radius: 12px;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .nav-header h1 {
+      margin: 0;
+      font-size: 1.5rem;
+    }
+    
+    .nav-header a {
+      color: white;
+      text-decoration: none;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      transition: all 0.2s;
+      font-weight: 500;
+    }
+    
+    .nav-header a:hover {
+      background: rgba(255, 255, 255, 0.3);
+      transform: translateY(-1px);
+    }
+
+    .section {
+      background: white;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    .section h2 {
+      margin-top: 0;
+      color: #374151;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 0.5rem;
+    }
+
+    .cdn-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    .cdn-table th, .cdn-table td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+    }
+
+    .cdn-table th {
+      background-color: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    .cdn-url {
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      background: #f1f5f9;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      word-break: break-all;
+    }
+
+    .code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1.5rem;
+      border-radius: 8px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .nav-header {
+        flex-direction: column;
+        text-align: center;
+        gap: 1rem;
+      }
+    }
+
+    .badge {
+      display: inline-block;
+      background: #3b82f6;
+      color: white;
+      padding: 0.25rem 0.75rem;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      margin-left: 0.5rem;
+    }
+
+    .badge.recommended {
+      background: #10b981;
+    }
+
+    .badge.latest {
+      background: #f59e0b;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="nav-header">
+    <h1>🌐 CDN Usage Guide</h1>
+    <a href="index.html">← Back to Examples</a>
+  </div>
+
+  <div class="section">
+    <h2>📦 Available CDN Options</h2>
+    <p>The REST API Playground bundle is available through multiple CDN providers for easy embedding in your applications.</p>
+    
+    <table class="cdn-table">
+      <thead>
+        <tr>
+          <th>CDN Provider</th>
+          <th>URL Pattern</th>
+          <th>Features</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>JSDelivr</strong> <span class="badge recommended">Recommended</span></td>
+          <td><span class="cdn-url">https://cdn.jsdelivr.net/gh/rmarchet/rest-api-playground@VERSION/dist/bundle.js</span></td>
+          <td>Version pinning, fast global CDN, reliable</td>
+        </tr>
+        <tr>
+          <td><strong>GitHub Pages CDN</strong> <span class="badge latest">Always Latest</span></td>
+          <td><span class="cdn-url">https://rmarchet.github.io/rest-api-playground-cdn/bundle.js</span></td>
+          <td>Always latest version, direct from source</td>
+        </tr>
+        <tr>
+          <td><strong>Unpkg</strong></td>
+          <td><span class="cdn-url">https://unpkg.com/rest-api-playground@VERSION/dist/bundle.js</span></td>
+          <td>NPM-based, version pinning available</td>
+        </tr>
+        <tr>
+          <td><strong>GitHub Releases</strong></td>
+          <td><span class="cdn-url">https://github.com/rmarchet/rest-api-playground/releases/download/VERSION/rest-api-playground.js</span></td>
+          <td>Direct downloads, versioned assets</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Quick Start Template</h2>
+    <p>Copy and paste this template to get started immediately:</p>
+    
+    <div class="code-block"><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My API Documentation</title>
+</head>
+<body>
+  <div id="api-playground"></div>
+  
+  <!-- Required: React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground CDN -->
+  <script src="https://cdn.jsdelivr.net/gh/rmarchet/rest-api-playground/dist/bundle.js"></script>
+  
+  <script>
+    const playground = new RestAPIClient({
+      config: {
+        title: 'My API',
+        subtitle: 'Test our REST endpoints',
+        theme: 'light'
+      }
+    });
+    playground.init({ container: 'api-playground' });
+  </script>
+</body>
+</html></div>
+  </div>
+
+  <div class="demo-grid">
+    <div>
+      <div class="section">
+        <h3>🎯 Version Pinning</h3>
+        <p>Pin to specific versions for production stability:</p>
+        
+        <h4>Latest Version (Auto-updates):</h4>
+        <div class="code-block"><script src="https://cdn.jsdelivr.net/gh/rmarchet/rest-api-playground/dist/bundle.js"></script></div>
+        
+        <h4>Specific Version (Recommended):</h4>
+        <div class="code-block"><script src="https://cdn.jsdelivr.net/gh/rmarchet/rest-api-playground@v1.2.3/dist/bundle.js"></script></div>
+        
+        <h4>Major Version Pinning:</h4>
+        <div class="code-block"><script src="https://cdn.jsdelivr.net/gh/rmarchet/rest-api-playground@1/dist/bundle.js"></script></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section">
+        <h3>⚡ Performance Tips</h3>
+        <ul>
+          <li><strong>Use JSDelivr</strong> for best global performance</li>
+          <li><strong>Pin versions</strong> in production environments</li>
+          <li><strong>Load React first</strong> before the playground bundle</li>
+          <li><strong>Use integrity hashes</strong> for additional security</li>
+          <li><strong>Consider preloading</strong> for better perceived performance</li>
+        </ul>
+        
+        <h4>With Preloading:</h4>
+        <div class="code-block"><link rel="preload" href="https://cdn.jsdelivr.net/gh/rmarchet/rest-api-playground/dist/bundle.js" as="script"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🎨 Configuration Examples</h2>
+    
+    <h3>Minimal Setup:</h3>
+    <div class="code-block">const playground = new RestAPIClient();
+playground.init({ container: 'playground' });</div>
+
+    <h3>Customized Configuration:</h3>
+    <div class="code-block">const playground = new RestAPIClient({
+  config: {
+    title: 'Payment API',
+    subtitle: 'Process payments securely',
+    theme: 'dark',
+    showHeader: true,
+    hideRequestPanel: false,
+    requestLabel: 'API Request',
+    responseLabel: 'API Response',
+    defaultUrl: 'https://api.example.com/payments'
+  }
+});
+playground.init({ container: 'payment-playground' });</div>
+
+    <h3>Embedded in Documentation:</h3>
+    <div class="code-block">const playground = new RestAPIClient({
+  config: {
+    showHeader: false,
+    hideRequestPanel: true,
+    responseLabel: 'Try it now →',
+    defaultUrl: 'https://api.docs.com/users/me'
+  }
+});
+playground.init({ container: 'inline-demo' });</div>
+  </div>
+
+  <div class="demo-grid">
+    <div>
+      <div class="section">
+        <h3>📋 JSDelivr CDN Example</h3>
+        <p>Using the recommended JSDelivr CDN with version pinning.</p>
+        <div id="jsdelivr-playground"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section">
+        <h3>🔄 GitHub Pages CDN Example</h3>
+        <p>Using GitHub Pages CDN (always latest version).</p>
+        <div id="pages-playground"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground Bundle - Local for this demo -->
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    async function init() {
+      // JSDelivr CDN Demo
+      const jsdelivrDemo = new RestAPIClient({
+        config: {
+          title: 'JSDelivr CDN Demo',
+          showHeader: true,
+          theme: 'light',
+          defaultUrl: 'https://jsonplaceholder.typicode.com/users/1'
+        }
+      });
+      jsdelivrDemo.init({ container: 'jsdelivr-playground' });
+
+      // GitHub Pages CDN Demo  
+      const pagesDemo = new RestAPIClient({
+        config: {
+          title: 'GitHub Pages CDN Demo',
+          showHeader: true,
+          theme: 'light',
+          defaultUrl: 'https://httpbin.org/get'
+        }
+      });
+      pagesDemo.init({ container: 'pages-playground' });
+    }
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+  </script>
+</body>
+</html>
