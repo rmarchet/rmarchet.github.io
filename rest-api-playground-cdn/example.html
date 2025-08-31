@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>REST API Playground CDN Example</title>
+</head>
+<body>
+  <div id="playground"></div>
+  
+  <!-- React CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  
+  <!-- REST API Playground CDN -->
+  <script src="https://rmarchet.github.io/rest-api-playground-cdn/bundle.js"></script>
+  
+  <script>
+    const playground = new RestAPIClient({
+      config: {
+        title: 'CDN Demo',
+        subtitle: 'Loaded from CDN'
+      }
+    });
+    playground.init({ container: 'playground' });
+  </script>
+</body>
+</html>
