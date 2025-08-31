@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Auto React Loading Demo - REST API Playground</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+.section 
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 768px) {
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+
+    }
+
+    .status-indicator {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      margin: 0.5rem 0;
+    }
+
+    .status-loading {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding: 0;
+    }
+
+    .feature-list 
+
+    .feature-list li:before {
+      content: "✅";
+      margin-right: 0.5rem;
+    }
+
+    .code-block {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1.5rem;
+      border-radius: 8px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+
+    .react-status {
+      font-family: monospace;
+      font-size: 0.875rem;
+      padding: 0.5rem 1rem;
+      background: #f1f5f9;
+      border-radius: 6px;
+      margin: 1rem 0;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-content">
+<div class="nav-header">
+    <h1>🔄 Auto React Loading Demo</h1>
+    <a href="index.html">← Back to Examples</a>
+  </div>
+
+  <div class="section">
+    <h2>🚀 Automatic React Dependency Management</h2>
+    <p>The REST API Playground now automatically detects and loads React dependencies only when needed. This makes embedding even simpler!</p>
+    
+    <h3>🎯 Features:</h3>
+    <ul class="feature-list">
+      <li>Detects if React is already loaded in your app</li>
+      <li>Automatically loads React CDN if not present</li>
+      <li>No duplicate React instances</li>
+      <li>Zero configuration required</li>
+      <li>Works with any React version (18+)</li>
+      <li>Graceful error handling</li>
+    </ul>
+
+    <div class="react-status" id="react-status">
+      Checking React availability...
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>📋 Simple Embedding (No React CDN Required)</h2>
+    <p>Notice how this page doesn't include React CDN scripts, yet the playground works perfectly!</p>
+    
+    <div class="code-block">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;My API Docs&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div id="playground"&gt;&lt;/div&gt;
+  
+  &lt;!-- No React CDN needed! --&gt;
+  &lt;script src="https://cdn.jsdelivr.net/gh/rmarchet/rest-api-playground/dist/bundle.js"&gt;&lt;/script&gt;
+  
+  &lt;script&gt;
+    async function init() {
+      const playground = new RestAPIClient({
+        config: {
+          title: 'Auto-Loading Demo',
+          subtitle: 'React loaded automatically'
+        }
+      });
+      await playground.init({ container: 'playground' });
+    }
+    init();
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</div>
+  </div>
+
+  <div class="demo-grid">
+    <div>
+      <div class="section">
+        <h3>🎮 Live Demo</h3>
+        <p>This playground was initialized without pre-loaded React:</p>
+        <div class="status-indicator" id="loading-status">
+          Initializing...
+        </div>
+        <div id="auto-playground"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="section">
+        <h3>🔧 How It Works</h3>
+        <ol>
+          <li><strong>Detection</strong>: Check if <code>window.React</code> and <code>window.ReactDOM</code> exist</li>
+          <li><strong>Loading</strong>: If not found, dynamically load from CDN</li>
+          <li><strong>Verification</strong>: Ensure React loaded correctly</li>
+          <li><strong>Initialization</strong>: Proceed with playground setup</li>
+          <li><strong>Error Handling</strong>: Graceful fallback for any issues</li>
+        </ol>
+        
+        <h4>Benefits:</h4>
+        <ul class="feature-list">
+          <li>Simpler embedding code</li>
+          <li>No version conflicts</li>
+          <li>Works in any environment</li>
+          <li>Future-proof</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- REST API Playground Bundle (no React CDN needed) -->
+  </div>
+
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    // Show React detection status
+    function updateReactStatus() {
+      const statusEl = document.getElementById('react-status');
+      const hasReact = window.React && window.ReactDOM;
+      
+      if (hasReact) {
+        statusEl.innerHTML = `✅ React detected: v${React.version} | ReactDOM: Available`;
+        statusEl.style.background = '#d1fae5';
+        statusEl.style.color = '#065f46';
+      } else {
+        statusEl.innerHTML = '⏳ React not detected - will be loaded automatically';
+        statusEl.style.background = '#fef3c7';
+        statusEl.style.color = '#92400e';
+      }
+    }
+
+    // Initialize playground with auto-loading
+    async function initPlayground() {
+      const loadingStatus = document.getElementById('loading-status');
+      
+      try {
+        loadingStatus.className = 'status-indicator status-loading';
+        loadingStatus.textContent = 'Loading React dependencies...';
+        
+        const playground = new RestAPIClient({
+          config: {
+            title: 'Auto-Loading Demo',
+            subtitle: 'React loaded automatically',
+            theme: 'light',
+            defaultUrl: 'https://jsonplaceholder.typicode.com/users/1'
+          }
+        });
+        
+        loadingStatus.textContent = 'Initializing playground...';
+        await playground.init({ container: 'auto-playground' });
+        
+        loadingStatus.className = 'status-indicator status-success';
+        loadingStatus.textContent = '✅ Playground ready!';
+        
+        // Update React status after loading
+        updateReactStatus();
+        
+      } catch (error) {
+        loadingStatus.className = 'status-indicator status-error';
+        loadingStatus.textContent = `❌ Error: ${error.message}`;
+      }
+    }
+
+    // Initial status check
+    updateReactStatus();
+
+    // Initialize when DOM is ready
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initPlayground);
+    } else {
+      initPlayground();
+    }
+  </script>
+  <script src="sidebar.js"></script>
+</body>
+</html>

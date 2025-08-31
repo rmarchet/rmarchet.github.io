@@ -4,45 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Payment API Documentation</title>
+  <link rel="stylesheet" href="shared.css">
   <style>
-    * {
+* {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
     }
-    
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-      line-height: 1.6;
-      color: #374151;
-      background: #f9fafb;
-    }
-    
-    .nav-header {
-      background: #6366f1;
-      color: white;
-      padding: 12px 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      position: sticky;
-      top: 0;
-      z-index: 1000;
-    }
-    .nav-header a {
-      color: white;
-      text-decoration: none;
-      background: rgba(255,255,255,0.2);
-      padding: 6px 12px;
-      border-radius: 6px;
-      transition: background 0.3s;
-      font-weight: 500;
-    }
-    .nav-header a:hover {
-      background: rgba(255,255,255,0.3);
-    }
-    
+
     .header {
       background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
       color: white;
@@ -62,10 +31,7 @@
       justify-content: space-between;
     }
     
-    .header h1 {
-      font-size: 1.5rem;
-      font-weight: 600;
-    }
+    .header 
     
     .nav-links {
       display: flex;
@@ -90,11 +56,7 @@
       padding: 2rem;
       background: white;
     }
-    
-    .section {
-      margin-bottom: 4rem;
-    }
-    
+
     .section-with-playground {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -114,19 +76,9 @@
       border: 1px solid #e5e7eb;
     }
     
-    .section h2 {
-      color: #1f2937;
-      font-size: 1.75rem;
-      margin-bottom: 1rem;
-      border-bottom: 2px solid #e5e7eb;
-      padding-bottom: 0.5rem;
-    }
+    .section 
     
-    .section h3 {
-      color: #374151;
-      font-size: 1.25rem;
-      margin: 2rem 0 1rem 0;
-    }
+    .section 
     
     .section h4 {
       color: #4b5563;
@@ -184,24 +136,9 @@
       font-weight: 500;
     }
     
-    .params-table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 1rem 0;
-      background: white;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
+    .params-
     
-    .params-table th {
-      background: #f3f4f6;
-      padding: 0.75rem;
-      text-align: left;
-      font-weight: 600;
-      color: #374151;
-      border-bottom: 1px solid #e5e7eb;
-    }
+    .params-table 
     
     .params-table td {
       padding: 0.75rem;
@@ -209,9 +146,7 @@
       vertical-align: top;
     }
     
-    .params-table tr:last-child td {
-      border-bottom: none;
-    }
+    .params-table 
     
     .param-name {
       font-family: 'Monaco', 'Menlo', monospace;
@@ -306,19 +241,11 @@
       margin-bottom: 2rem;
     }
     
-    .toc h3 {
-      margin: 0 0 1rem 0;
-      color: #374151;
-    }
+    .toc 
     
-    .toc ul {
-      list-style: none;
-      padding-left: 0;
-    }
+    .toc 
     
-    .toc li {
-      margin: 0.5rem 0;
-    }
+    .toc 
     
     .toc a {
       color: #6366f1;
@@ -362,9 +289,7 @@
         padding: 1rem;
       }
       
-      .params-table {
-        font-size: 0.875rem;
-      }
+      .params-
       
       .endpoint-header {
         flex-direction: column;
@@ -375,7 +300,8 @@
   </style>
 </head>
 <body>
-  <div class="nav-header">
+  <div class="main-content">
+<div class="nav-header">
     <a href="index.html">← Back to Examples</a>
     <span>API Documentation Sidebar Layout</span>
   </div>
@@ -692,6 +618,8 @@ Authorization: Bearer your_api_key_here
   </div>
 
   <!-- React CDN -->
+  </div>
+
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
   
@@ -830,5 +758,6 @@ Authorization: Bearer your_api_key_here
       });
     });
   </script>
+  <script src="sidebar.js"></script>
 </body>
 </html>

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Browser Error Testing - REST API Playground</title>
+  <link rel="stylesheet" href="shared.css">
+  <style>
+.section 
+
+    .status-indicator {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-weight: 500;
+      margin: 0.5rem 0;
+    }
+
+    .status-loading {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .status-success {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .status-error {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .debug-info {
+      background: #f1f5f9;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.875rem;
+      margin: 1rem 0;
+    }
+
+    .console-log {
+      background: #1e293b;
+      color: #e2e8f0;
+      padding: 1rem;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.875rem;
+      margin: 1rem 0;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="main-content">
+<div class="nav-header">
+    <h1>🐛 Browser Error Testing</h1>
+    <a href="index.html">← Back to Examples</a>
+  </div>
+
+  <div class="section">
+    <h2>🔍 Error Detection & Debugging</h2>
+    <p>This page helps debug browser console errors with detailed logging.</p>
+    
+    <div class="status-indicator" id="global-status">
+      Checking global availability...
+    </div>
+
+    <div class="debug-info" id="debug-info">
+      Initializing debug information...
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>📋 Console Output</h2>
+    <div class="console-log" id="console-output">
+      Console output will appear here...
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>🎮 Playground Test</h2>
+    <div class="status-indicator" id="playground-status">
+      Ready to test...
+    </div>
+    <div id="playground-container"></div>
+  </div>
+
+  <!-- REST API Playground Bundle -->
+  </div>
+
+  <script src="dist/bundle.js"></script>
+  
+  <script>
+    // Console capture
+    const consoleOutput = document.getElementById('console-output');
+    const originalLog = console.log;
+    const originalError = console.error;
+    const originalWarn = console.warn;
+
+    function addToConsole(level, ...args) {
+      const timestamp = new Date().toLocaleTimeString();
+      const message = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg) : String(arg)).join(' ');
+      consoleOutput.innerHTML += `[${timestamp}] ${level.toUpperCase()}: ${message}\n`;
+      consoleOutput.scrollTop = consoleOutput.scrollHeight;
+    }
+
+    console.log = (...args) => {
+      originalLog(...args);
+      addToConsole('log', ...args);
+    };
+
+    console.error = (...args) => {
+      originalError(...args);
+      addToConsole('error', ...args);
+    };
+
+    console.warn = (...args) => {
+      originalWarn(...args);
+      addToConsole('warn', ...args);
+    };
+
+    // Debug information
+    function updateDebugInfo() {
+      const debugInfo = document.getElementById('debug-info');
+      const globalStatus = document.getElementById('global-status');
+      
+      const info = {
+        'Window React': !!window.React,
+        'Window ReactDOM': !!window.ReactDOM,
+        'ReactDOM.createRoot': !!(window.ReactDOM && window.ReactDOM.createRoot),
+        'RestAPIClient Available': typeof window.RestAPIClient !== 'undefined',
+        'RestAPIClient Type': typeof window.RestAPIClient,
+        'Document Ready': document.readyState,
+        'Scripts Loaded': Array.from(document.scripts).map(s => s.src.split('/').pop()).filter(Boolean)
+      };
+
+      debugInfo.innerHTML = Object.entries(info)
+        .map(([key, value]) => `<div><strong>${key}:</strong> ${JSON.stringify(value)}</div>`)
+        .join('');
+
+      if (typeof window.RestAPIClient !== 'undefined') {
+        globalStatus.className = 'status-indicator status-success';
+        globalStatus.textContent = '✅ RestAPIClient available globally';
+      } else {
+        globalStatus.className = 'status-indicator status-error';
+        globalStatus.textContent = '❌ RestAPIClient not found';
+      }
+    }
+
+    // Test playground initialization
+    async function testPlayground() {
+      const statusEl = document.getElementById('playground-status');
+      
+      try {
+        console.log('Starting playground test...');
+        
+        if (typeof RestAPIClient === 'undefined') {
+          throw new Error('RestAPIClient is not defined globally');
+        }
+
+        statusEl.className = 'status-indicator status-loading';
+        statusEl.textContent = 'Initializing playground...';
+
+        const playground = new RestAPIClient({
+          config: {
+            title: 'Error Test Playground',
+            subtitle: 'Testing browser compatibility',
+            theme: 'light'
+          }
+        });
+
+        console.log('RestAPIClient instance created');
+
+        await playground.init({ container: 'playground-container' });
+
+        console.log('Playground initialized successfully');
+
+        statusEl.className = 'status-indicator status-success';
+        statusEl.textContent = '✅ Playground working!';
+
+      } catch (error) {
+        console.error('Playground initialization failed:', error);
+        statusEl.className = 'status-indicator status-error';
+        statusEl.textContent = `❌ Error: ${error.message}`;
+      }
+    }
+
+    // Initialize debugging
+    console.log('=== Browser Error Test Started ===');
+    updateDebugInfo();
+
+    // Update debug info periodically
+    setInterval(updateDebugInfo, 1000);
+
+    // Test playground after a delay
+    setTimeout(() => {
+      console.log('Starting playground test in 2 seconds...');
+      testPlayground();
+    }, 2000);
+
+    // Catch any unhandled errors
+    window.addEventListener('error', (event) => {
+      console.error('Unhandled error:', event.error);
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+      console.error('Unhandled promise rejection:', event.reason);
+    });
+  </script>
+  <script src="sidebar.js"></script>
+</body>
+</html>
