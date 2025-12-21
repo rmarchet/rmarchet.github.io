@@ -2,6 +2,7 @@
 // showDarkSoulsNotification('YOU DIED', 3000);
 // showDarkSoulsNotification('ENEMY FELLED', 2000);
 class DarkSoulsNotification {
+  audioURL = 'https://rmarchet.github.io/dark-souls-notification/ds.mp3';
   constructor() {
     // Remove existing overlay if present
     const existingOverlay = document.querySelector('.ds-overlay');
@@ -37,11 +38,11 @@ class DarkSoulsNotification {
     document.body.appendChild(overlay);
     
     // Play audio sound
-    const audio = new Audio('https://us-tuna-sounds-files.voicemod.net/e0368dff-514e-4ccd-bf7a-464f46c07d8a-1676915576697.mp3');
+    const audio = new Audio(this.audioURL);
     audio.volume = 0.67; // Set volume (0.0 to 1.0)
     audio.play().catch(error => {
       // Handle autoplay restrictions - user interaction may be required
-      console.log('Audio playback failed:', error);
+      console.warn('Audio playback failed:', error);
     });
     
     // Trigger fade in
@@ -60,8 +61,4 @@ class DarkSoulsNotification {
       }, 600);
     }, duration);
   }
-}
-
-function showDarkSoulsNotification(message, duration = 3000) {
-
 }
