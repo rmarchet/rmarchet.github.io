@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="style.css">
+    <script src="index.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      
+      html, body {
+        width: 100%;
+        height: 100%;
+        color: white;
+        background-color: black;
+        background-image: url('https://i0.wp.com/www.ludicamag.com/wp-content/uploads/2018/05/darksouls.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+      }
+
+      .page {
+        padding: 2rem;
+        font-family: Arial, sans-serif;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: inline-block;
+      }
+      .page ul {
+        margin-left: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page">
+      <h1>Dark Souls Notification Demo</h1>
+      <p>Open the browser console and try:</p>
+      <ul>
+        <li><code>new DarkSoulsNotification().show('YOU DIED', 3000)</code> <button onclick="new DarkSoulsNotification().show('YOU DIED', 3000)">Play</button></li>
+        <li><code>new DarkSoulsNotification().show('ENEMY FELLED', 2000)</code> <button onclick="new DarkSoulsNotification().show('ENEMY FELLED', 2000)">Play</button></li>
+        <li><code>new DarkSoulsNotification().show('EMAIL SENT', 2500)</code> <button onclick="new DarkSoulsNotification().show('EMAIL SENT', 2500)">Play</button></li>
+      </ul>
+    </div>
+    
+  </body>
+</html>
