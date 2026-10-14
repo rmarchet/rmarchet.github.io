@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DJTWorld</title>
+<link href="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.css" rel="stylesheet">
+<style>
+:root{color-scheme:light;--bg:#fff8df;--panel:#fffef8;--line:#25354a;--text:#17283d;--muted:#596b7f;--accent:#ff5c8a;--blue:#55d6ff;--yellow:#ffe66d;--green:#a7f3b5}
+*{box-sizing:border-box}html,body{height:100%;margin:0;font-family:"Trebuchet MS",ui-rounded,system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--text)}
+body{display:flex;flex-direction:column;min-height:520px}
+header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:12px 18px;border-bottom:3px solid var(--line);background:#ffdf68;z-index:2}
+.brand{display:flex;align-items:center;gap:11px}.logo{width:39px;height:39px;display:grid;place-items:center;border:2px solid var(--line);border-radius:13px;background:#ff5c8a;font-size:21px;font-weight:1000;color:white;transform:rotate(-5deg);box-shadow:3px 3px 0 var(--line)}.brand h1{font-size:20px;margin:0;letter-spacing:-.6px;font-weight:1000}.brand p{font-size:11px;color:#45556a;margin:2px 0 0;font-weight:700}
+.actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.status{font-size:11px;color:#205b3d;display:flex;align-items:center;gap:6px;font-weight:800}.dot{width:8px;height:8px;border:1px solid #205b3d;border-radius:50%;background:#34d399}
+button,input,select{font:inherit}button{cursor:pointer;border:2px solid var(--line);border-radius:11px;background:#fff;color:var(--text);padding:9px 12px;font-size:12px;font-weight:850;box-shadow:2px 2px 0 var(--line);transition:transform .12s,box-shadow .12s}button:hover{transform:translate(-1px,-1px);box-shadow:3px 3px 0 var(--line)}button:active{transform:translate(1px,1px);box-shadow:0 0 0 var(--line)}button.primary{background:#ff5c8a;color:#fff;border-color:var(--line)}button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #2089ff;outline-offset:2px}
+#map-wrap{position:relative;flex:1;min-height:400px}#map{position:absolute;inset:0}
+.panel{background:var(--panel);border:2px solid var(--line);border-radius:18px;box-shadow:5px 5px 0 #17283d;backdrop-filter:blur(8px)}
+.editor{position:absolute;left:17px;top:17px;width:min(315px,calc(100% - 34px));padding:15px;z-index:3}
+.eyebrow{display:inline-block;font-size:10px;letter-spacing:1.1px;text-transform:uppercase;color:#17283d;background:#8ee9ff;border:1.5px solid var(--line);border-radius:7px;padding:5px 7px;font-weight:1000;transform:rotate(-1deg)}.editor h2{font-size:19px;margin:10px 0 5px;letter-spacing:-.4px}.sub{font-size:12px;line-height:1.55;color:var(--muted);margin:0 0 13px}
+label{display:block;font-size:11px;color:#354960;margin:11px 0 6px;font-weight:850}input,select{width:100%;border:2px solid var(--line);background:#fff;color:var(--text);padding:10px;border-radius:10px;font-size:14px;min-width:0}input::placeholder{color:#8190a0}.row{display:flex;gap:8px;margin-top:11px}.row button{flex:1}.coords{font-size:10px;color:var(--muted);margin-top:10px;font-weight:700}.place-list{margin-top:15px;border-top:2px dashed #b9c4ce;padding-top:12px}.list-head{display:flex;justify-content:space-between;align-items:center;font-size:11px;font-weight:1000;margin-bottom:8px}.count{color:var(--muted);font-weight:700}.places{display:grid;gap:7px;max-height:150px;overflow:auto}.place{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 9px;border:1.5px solid var(--line);border-radius:10px;background:#e5f9ff;font-size:12px;font-weight:800}.place:nth-child(3n+2){background:#fff0f5}.place:nth-child(3n){background:#edffe8}.place button{padding:5px 8px;font-size:10px;box-shadow:1px 1px 0 var(--line)}.empty{font-size:11px;color:var(--muted);line-height:1.5;padding:4px 0}
+.wizard{position:absolute;right:17px;bottom:17px;width:min(330px,calc(100% - 34px));padding:17px;z-index:4;background:#fff1f7}.wizard-top{display:flex;justify-content:space-between;align-items:center}.step{font-size:10px;color:#b51c55;letter-spacing:1px;text-transform:uppercase;font-weight:1000}.close{border:0;background:transparent;color:var(--muted);font-size:22px;padding:2px 6px;box-shadow:none}.wizard h2{font-size:18px;margin:10px 0 6px}.wizard p{font-size:12px;color:#47576a;line-height:1.65;margin:0 0 15px}.wizard-foot{display:flex;align-items:center;justify-content:space-between;gap:10px}.dots{display:flex;gap:5px}.dots span{height:7px;width:18px;border:1.5px solid var(--line);border-radius:10px;background:#fff}.dots span.active{background:#ff5c8a}.wizard-buttons{display:flex;gap:8px}
+.maplibregl-ctrl-group{background:#fff!important;border:2px solid var(--line)!important;border-radius:10px!important;box-shadow:2px 2px 0 var(--line)!important;overflow:hidden}.maplibregl-ctrl-group button{background-color:#fff!important;box-shadow:none;border:0;border-radius:0;padding:0}.maplibregl-ctrl button .maplibregl-ctrl-icon{filter:none}
+.custom-label{font-size:12px;font-weight:1000;color:#17283d;background:#ffe66d;border:2px solid #17283d;border-radius:12px;padding:7px 10px;box-shadow:3px 3px 0 #17283d;white-space:nowrap;cursor:pointer;max-width:230px;overflow:hidden;text-overflow:ellipsis}.custom-label:after{content:" ✨"}.custom-label:hover{background:#ff8bb0;transform:rotate(-2deg)}
+.toast{position:absolute;left:50%;bottom:18px;transform:translateX(-50%);background:#fff0a8;border:2px solid var(--line);border-radius:12px;padding:11px 15px;font-size:12px;font-weight:850;z-index:5;display:none;max-width:calc(100% - 24px);box-shadow:3px 3px 0 var(--line)}
+@media(max-width:620px){header{padding:10px 12px}.status{display:none}.brand p{display:none}.editor{top:10px;left:10px;width:min(280px,calc(100% - 20px));padding:12px}.editor .place-list{margin-top:10px;padding-top:9px}.places{max-height:105px}.wizard{right:10px;bottom:10px;width:min(300px,calc(100% - 20px));padding:13px}#map-wrap{min-height:600px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand"><div class="logo">D</div><div><h1>DJTWorld</h1><p>The silly atlas: you make the rules!</p></div></div>
+  <div class="actions"><span class="status"><span class="dot"></span><span id="save-status">Local saving on</span></span><button id="help-btn" type="button">Guide</button></div>
+</header>
+<main id="map-wrap">
+  <div id="map" aria-label="Interactive world map"></div>
+  <section class="panel editor" aria-label="Place editor">
+    <div class="eyebrow">DEPARTMENT OF ABSURD RENAMINGS</div>
+    <h2>Give it a new name! 🎨</h2>
+    <p class="sub">The world is way too serious. Let's fix that! Pick a place or click the map to invent one.</p>
+    <label for="place-select">Place</label>
+    <select id="place-select" style="width:100%;padding:10px;border-radius:8px;background:#0a1422;color:#eef4ff;border:1px solid #34465e;font:inherit;font-size:13px">
+      <option value="gulf">Gulf of Mexico</option><option value="persian">Persian Gulf</option><option value="sea-japan">Sea of Japan</option><option value="custom">New place (click the map)</option>
+    </select>
+    <label for="new-name">Brand-new name</label>
+    <input id="new-name" maxlength="70" placeholder="E.g. Gulf of America" autocomplete="off">
+    <div class="row"><button id="locate-btn" type="button">Take me there! 🧭</button><button id="save-btn" class="primary" type="button">Publish! 🚀</button></div>
+    <div class="coords" id="coords">Coordinates: —</div>
+    <div class="place-list"><div class="list-head"><span>Your genius ideas</span><span class="count" id="count">0 saved</span></div><div id="places" class="places"><div class="empty">No wacky names yet. The planet awaits your creativity!</div></div></div>
+  </section>
+  <aside class="panel wizard" id="wizard" aria-live="polite">
+    <div class="wizard-top"><span class="step" id="wizard-step">STEP 1 OF 3</span><button class="close" id="wizard-close" type="button" aria-label="Close guide">×</button></div>
+    <h2 id="wizard-title">Hey there, world renamer! 🌎</h2><p id="wizard-copy">This is DJTWorld: the planet is your geographic doodle pad. Zoom, drag and get ready to make history… sort of.</p>
+    <div class="wizard-foot"><div class="dots"><span class="active"></span><span></span><span></span></div><div class="wizard-buttons"><button id="wizard-back" type="button" disabled>Back</button><button id="wizard-next" class="primary" type="button">Next</button></div></div>
+  </aside>
+  <div class="toast" id="toast" role="status"></div>
+</main>
+<script src="https://unpkg.com/maplibre-gl@5.6.2/dist/maplibre-gl.js"></script>
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const presets={
+    gulf:{original:"Gulf of Mexico",name:"Gulf of Mexico",center:[-90,24],zoom:3.5},
+    persian:{original:"Persian Gulf",name:"Persian Gulf",center:[52,27],zoom:4},
+    "sea-japan":{original:"Sea of Japan",name:"Sea of Japan",center:[135,40],zoom:3.5}
+  };
+  let selectedKey="gulf", selectedCoords=[-90,24], customMode=false, labels={}, markers={}, wizardIndex=0, db=null;
+  const steps=[
+    ["Hey there, world renamer! 🌎","Explore the globe with the interactive map. You can zoom, drag and pick the places you want to rename."],
+    ["Geographic baptisms! 🖍️","Select a sample place, edit the name and hit “Publish! 🚀”. For a different place, choose “New place” and click the map."],
+    ["The little elephant's memory 🐘","Names are stored in IndexedDB, in your browser. They stay on this device. Note: for now, new names sit on top of the originals like stickers on a globe."]
+  ];
+  function toast(msg){const t=$("toast");t.textContent=msg;t.style.display="block";clearTimeout(toast.timer);toast.timer=setTimeout(()=>t.style.display="none",3200)}
+  function updateWizard(){const s=steps[wizardIndex];$("wizard-step").textContent=`STEP ${wizardIndex+1} OF ${steps.length}`;$("wizard-title").textContent=s[0];$("wizard-copy").textContent=s[1];$("wizard-back").disabled=wizardIndex===0;$("wizard-next").textContent=wizardIndex===steps.length-1?"Got it":"Next";document.querySelectorAll(".dots span").forEach((d,i)=>d.classList.toggle("active",i===wizardIndex))}
+  function openDB(){return new Promise((resolve,reject)=>{if(!("indexedDB" in window)){reject(new Error("IndexedDB not supported"));return}const req=indexedDB.open("DJTWorldDB",1);req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains("labels"))req.result.createObjectStore("labels",{keyPath:"id"})};req.onsuccess=()=>{db=req.result;resolve(db)};req.onerror=()=>reject(req.error)})}
+  function dbAll(){return new Promise((resolve,reject)=>{const r=db.transaction("labels","readonly").objectStore("labels").getAll();r.onsuccess=()=>resolve(r.result||[]);r.onerror=()=>reject(r.error)})}
+  function dbPut(item){return new Promise((resolve,reject)=>{const r=db.transaction("labels","readwrite").objectStore("labels").put(item);r.onsuccess=resolve;r.onerror=()=>reject(r.error)})}
+  function dbDelete(id){return new Promise((resolve,reject)=>{const r=db.transaction("labels","readwrite").objectStore("labels").delete(id);r.onsuccess=resolve;r.onerror=()=>reject(r.error)})}
+  const map=new maplibregl.Map({container:"map",style:"https://tiles.openfreemap.org/styles/liberty",center:presets.gulf.center,zoom:2.1,attributionControl:true});
+  map.addControl(new maplibregl.NavigationControl({visualizePitch:true}),"bottom-left");
+  function attachDirectRename(){
+    // Enable double-click editing for visible named map features (landmarks/labels).
+    const style=map.getStyle();
+    if(!style||!style.layers)return;
+    style.layers.forEach(layer=>{
+      if(!/symbol/.test(layer.type))return;
+      const id=layer.id;
+      // Only query features on double-click; no need to alter the basemap's styling.
+    });
+  }
+  map.on("dblclick",e=>{
+    // The standard double-click zoom is prevented so the gesture can rename instead.
+    const features=map.queryRenderedFeatures(e.point);
+    const feature=features.find(f=>{
+      const props=f.properties||{};
+      return props.name||props.name_en||props.name_int||props["name:en"]||props.ref;
+    });
+    if(!feature){toast("Can't find a label to rename here. Try double-clicking right on the name!");return}
+    const props=feature.properties||{};
+    const original=props.name||props.name_en||props.name_int||props["name:en"]||props.ref||"Place on the map";
+    const coords=[e.lngLat.lng,e.lngLat.lat];
+    const suggested=String(original).slice(0,70);
+    $("place-select").value="custom";customMode=true;selectedKey="landmark-"+Date.now();selectedCoords=coords;
+    $("new-name").value=suggested;$("coords").textContent=`Coordinates: ${coords[1].toFixed(4)}, ${coords[0].toFixed(4)}`;
+    $("new-name").focus();$("new-name").select();
+    toast("Label selected: edit the name in the panel and hit “Publish!”."); 
+  });
+  map.doubleClickZoom.disable();
+  map.on("load",async()=>{attachDirectRename();try{await openDB();const saved=await dbAll();saved.forEach(x=>{labels[x.id]=x;addMarker(x)});renderList();$("save-status").textContent="IndexedDB saving on"}catch(e){$("save-status").textContent="Local storage unavailable";toast("Can't open IndexedDB: check your browser settings.") }});
+  function addMarker(item){if(markers[item.id])markers[item.id].remove();const el=document.createElement("button");el.type="button";el.className="custom-label";el.textContent=item.name;el.title="Custom label: "+item.name;el.setAttribute("aria-label","Edit "+item.name);el.addEventListener("click",()=>loadItem(item.id));markers[item.id]=new maplibregl.Marker({element:el,anchor:"bottom"}).setLngLat([item.lng,item.lat]).addTo(map)}
+  function renderList(){const box=$("places");box.innerHTML="";const arr=Object.values(labels).sort((a,b)=>a.name.localeCompare(b.name,"en"));$("count").textContent=arr.length+" saved";if(!arr.length){box.innerHTML='<div class="empty">No wacky names yet. The planet awaits your creativity!</div>';return}arr.forEach(item=>{const row=document.createElement("div");row.className="place";const name=document.createElement("span");name.textContent=item.name;name.style.cssText="min-width:0;overflow-wrap:anywhere";const btn=document.createElement("button");btn.type="button";btn.textContent="Open";btn.addEventListener("click",()=>{loadItem(item.id);map.flyTo({center:[item.lng,item.lat],zoom:Math.max(map.getZoom(),3.5)})});row.append(name,btn);box.append(row)})}
+  function loadItem(id){const x=labels[id];if(!x)return;selectedKey=id;selectedCoords=[x.lng,x.lat];customMode=!presets[id];$("place-select").value=presets[id]?id:"custom";$("new-name").value=x.name;$("coords").textContent=`Coordinates: ${x.lat.toFixed(4)}, ${x.lng.toFixed(4)}`;map.flyTo({center:selectedCoords,zoom:Math.max(map.getZoom(),3.5)});$("new-name").focus()}
+  $("place-select").addEventListener("change",()=>{const v=$("place-select").value;if(v==="custom"){customMode=true;selectedKey="custom-"+Date.now();$("new-name").value="";$("coords").textContent="Coordinates: click the map";toast("Click the map to plant your imaginary flag!");return}customMode=false;selectedKey=v;selectedCoords=presets[v].center;$("new-name").value=labels[v]?.name||presets[v].name;$("coords").textContent=`Coordinates: ${selectedCoords[1].toFixed(4)}, ${selectedCoords[0].toFixed(4)}`});
+  $("locate-btn").addEventListener("click",()=>{if(!selectedCoords){toast("Click the map first to pick a spot.");return}map.flyTo({center:selectedCoords,zoom:Math.max(map.getZoom(),presets[selectedKey]?.zoom||4)});});
+  map.on("click",e=>{if(!customMode)return;selectedCoords=[e.lngLat.lng,e.lngLat.lat];$("coords").textContent=`Coordinates: ${selectedCoords[1].toFixed(4)}, ${selectedCoords[0].toFixed(4)}`;if(!$("new-name").value)$("new-name").value="Custom place";$("new-name").focus();toast("Spot selected. Enter a name and save.")});
+  $("save-btn").addEventListener("click",async()=>{const name=$("new-name").value.trim();if(!name){toast("A name is required! Even “Top-secret spot” works just fine.");$("new-name").focus();return}if(!selectedCoords){toast("Click the map first to choose where to plant your flag!");return}if(!db){toast("Storage not ready: wait a moment and try again.");return}
+    let id=selectedKey;if(customMode&&(!id||presets[id]))id="custom-"+Date.now();const item={id,name,original:presets[id]?.original||labels[id]?.original||"Custom place",lng:selectedCoords[0],lat:selectedCoords[1],updatedAt:Date.now()};
+    try{await dbPut(item);labels[id]=item;selectedKey=id;addMarker(item);renderList();toast("Name published! Geography will never be the same. 🎉");$("save-status").textContent="Changes saved";}catch(e){toast("Error while saving. Please try again.")}});
+  $("wizard-next").addEventListener("click",()=>{if(wizardIndex<steps.length-1){wizardIndex++;updateWizard()}else $("wizard").hidden=true});
+  $("wizard-back").addEventListener("click",()=>{if(wizardIndex>0){wizardIndex--;updateWizard()}});
+  $("wizard-close").addEventListener("click",()=>$("wizard").hidden=true);
+  $("help-btn").addEventListener("click",()=>{$("wizard").hidden=false;wizardIndex=0;updateWizard()});
+})();
+</script>
+</body>
+</html>
