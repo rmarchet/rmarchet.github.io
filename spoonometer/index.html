@@ -185,6 +185,11 @@ footer p{max-width:72ch; margin:0}
     "eventbrite.com":"Eventbrite", "komoot.com":"Komoot", "meetup.com":"Meetup",
     "aol.com":"AOL", "remini.ai":"Remini", "splice.com":"Splice", "filmicpro.com":"Filmic"
   };
+  // if the input contains any of these, the company counts as already acquired
+  const ACQUIRED_KEYWORDS = [
+    ["mailchimp","Mailchimp"], ["miro","Miro"], ["airtable","Airtable"],
+    ["eventbrite","Eventbrite"], ["vimeo","Vimeo"], ["komoot","Komoot"]
+  ];
   const GIANTS = ["google.com","apple.com","microsoft.com","amazon.com","meta.com","facebook.com","netflix.com","openai.com","anthropic.com","nvidia.com"];
 
   function normalize(raw){
@@ -351,8 +356,10 @@ footer p{max-width:72ch; margin:0}
   form.addEventListener("submit", async e=>{
     e.preventDefault();
     err.textContent="";
-    const domain = normalize(input.value);
-    if(!domain || !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(domain)){
+    const rawLow = input.value.trim().toLowerCase();
+    const kw = ACQUIRED_KEYWORDS.find(k=>rawLow.includes(k[0]));
+    const domain = normalize(input.value) || rawLow;
+    if(!kw && (!domain || !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(domain))){
       err.textContent="Enter a valid web address, for example mycompany.com.";
       input.focus(); return;
     }
@@ -361,9 +368,11 @@ footer p{max-width:72ch; margin:0}
     await scanning();
 
     let data = score(domain), special=null;
-    if(ACQUIRED[domain]){
+    const acquiredName = kw ? kw[1] : ACQUIRED[domain];
+    if(acquiredName){
       data = {p:100, f:[98,95,97,99]};
-      special = ACQUIRED[domain]+"? Too late: this spoon has already been bent.";
+      special = acquiredName+" has already been acquired by Bending Spoons. This spoon is already bent.";
+      pctLabel.textContent="already acquired";
     } else if(domain==="bendingspoons.com"){
       data = {p:0, f:[90,5,10,99]};
       special = "A spoon can’t bend itself. Try another site.";
@@ -373,7 +382,7 @@ footer p{max-width:72ch; margin:0}
     }
 
     bend(data.p); countTo(data.p);
-    last={domain, p:data.p, v: special || verdictFor(data.p)};
+    last={domain, p:data.p, v: special || verdictFor(data.p), acq: acquiredName};
     render(domain,data,special);
     go.disabled=false;
   });
@@ -385,7 +394,9 @@ footer p{max-width:72ch; margin:0}
 
   $("copy").addEventListener("click", async ()=>{
     if(!last) return;
-    const text = "According to the Spoonometer, "+last.domain+" has a "+last.p+"% chance of being Bending Spoons’ next acquisition. "+last.v;
+    const text = last.acq
+      ? "According to the Spoonometer, "+last.acq+" has already been acquired by Bending Spoons. This spoon is already bent."
+      : "According to the Spoonometer, "+last.domain+" has a "+last.p+"% chance of being Bending Spoons’ next acquisition. "+last.v;
     const btn=$("copy");
     try{ await navigator.clipboard.writeText(text); btn.textContent="Result copied"; }
     catch(_){ btn.textContent="Copy failed"; }
