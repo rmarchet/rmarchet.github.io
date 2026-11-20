@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Spoonometer – is your company next?</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,600;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#EEF1F8; --surface:#FFFFFF; --ink:#16204F; --muted:#5A6386;
+  --steel:#B9C1D3; --steel-hi:#E4E8F0; --accent:#E2337A; --accent-ink:#FFFFFF;
+  --line:#D5DAE6; --ok:#1F8A5B;
+  color-scheme:light;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#10152E; --surface:#182046; --ink:#EEF1FA; --muted:#A3ABCB;
+    --steel:#6F7896; --steel-hi:#A9B1C9; --accent:#FF5A9A; --accent-ink:#10152E;
+    --line:#2A3466; --ok:#4FD39A; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#10152E; --surface:#182046; --ink:#EEF1FA; --muted:#A3ABCB;
+  --steel:#6F7896; --steel-hi:#A9B1C9; --accent:#FF5A9A; --accent-ink:#10152E;
+  --line:#2A3466; --ok:#4FD39A; color-scheme:dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:inherit}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font-family:"Instrument Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  font-size:17px; line-height:1.55;
+}
+main{max-width:1080px; margin:0 auto; padding:clamp(24px,5vw,64px) clamp(18px,4vw,40px) 40px}
+.hero{display:grid; grid-template-columns:1.25fr .9fr; gap:clamp(24px,5vw,72px); align-items:center}
+h1{
+  font-family:"Bricolage Grotesque",Georgia,serif; font-weight:800;
+  font-size:clamp(2.4rem,6.4vw,4.6rem); line-height:.98; letter-spacing:-.03em;
+  margin:0 0 20px;
+}
+.lede{color:var(--muted); max-width:46ch; margin:0 0 28px; font-size:1.06rem}
+form{display:flex; gap:10px; flex-wrap:wrap; max-width:560px}
+.field{flex:1 1 260px; position:relative}
+input{
+  width:100%; font:inherit; font-size:1.05rem; color:var(--ink);
+  background:var(--surface); border:2px solid var(--line); border-radius:14px;
+  padding:15px 16px;
+}
+input:focus{outline:none; border-color:var(--ink)}
+button{
+  font:inherit; font-weight:600; font-size:1.05rem; cursor:pointer;
+  border:0; border-radius:14px; padding:15px 22px;
+  background:var(--accent); color:var(--accent-ink);
+}
+button:focus-visible,input:focus-visible{outline:3px solid var(--accent); outline-offset:3px}
+button:disabled{opacity:.6; cursor:progress}
+.hint{font-size:.9rem; color:var(--muted); margin:10px 0 0}
+.error{color:var(--accent); font-size:.95rem; margin:10px 0 0; min-height:1.4em}
+
+/* spoon */
+.stage{display:flex; flex-direction:column; align-items:center}
+.stage svg{width:min(100%,340px); height:auto; overflow:visible}
+#handle{fill:url(#handleMetal)}
+#shine{fill:none; stroke:var(--steel-hi); stroke-width:3; stroke-linecap:round; opacity:.9}
+#shade{fill:none; stroke:var(--ink); stroke-width:2.5; stroke-linecap:round; opacity:.12}
+#shadow{fill:var(--ink); opacity:.10}
+.pct{
+  font-family:"Bricolage Grotesque",Georgia,serif; font-weight:800;
+  font-size:clamp(3.4rem,9vw,5.6rem); line-height:1; letter-spacing:-.04em;
+  font-variant-numeric:tabular-nums; margin-top:-6px;
+}
+.pct-label{color:var(--muted); font-size:.95rem; text-align:center; max-width:28ch}
+
+/* result */
+#result{margin-top:clamp(36px,6vw,64px); display:none}
+#result.show{display:block}
+.verdict{
+  font-family:"Bricolage Grotesque",Georgia,serif; font-weight:600;
+  font-size:clamp(1.5rem,3.4vw,2.1rem); line-height:1.15; letter-spacing:-.015em;
+  margin:0 0 8px; max-width:30ch;
+}
+.domain{color:var(--muted); margin:0 0 28px}
+.factors{display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px 40px; margin:0; padding:0; list-style:none}
+.factor .row{display:flex; justify-content:space-between; gap:12px; font-weight:500}
+.factor .row span:last-child{font-variant-numeric:tabular-nums; color:var(--muted)}
+.bar{height:10px; background:var(--steel-hi); border-radius:99px; overflow:hidden; margin-top:6px}
+.bar i{display:block; height:100%; width:0; background:var(--ink); border-radius:99px; transition:width 1s ease}
+.factor p{margin:6px 0 0; font-size:.92rem; color:var(--muted)}
+.actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:32px}
+.ghost{background:transparent; color:var(--ink); border:2px solid var(--ink)}
+footer{max-width:1080px; margin:0 auto; padding:24px clamp(18px,4vw,40px) 40px; color:var(--muted); font-size:.85rem; border-top:1px solid var(--line)}
+footer p{max-width:72ch; margin:0}
+
+.scan{font-size:.95rem; color:var(--muted); min-height:1.5em; text-align:center; margin-top:6px}
+
+@media (max-width:760px){
+  .hero{grid-template-columns:1fr}
+  .stage{order:-1}
+  .stage svg{width:min(70%,240px)}
+  .factors{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  .bar i{transition:none}
+}
+</style>
+</head>
+<body>
+<main>
+  <section class="hero">
+    <div>
+      <h1>Is your company the next spoon to bend?</h1>
+      <p class="lede">Enter your company’s website and the Spoonometer will calculate how likely it is to end up in the portfolio of Bending Spoons, the Milan-based group that buys well-known apps and whips them back into shape.</p>
+      <form id="f" novalidate>
+        <div class="field">
+          <label for="url" class="sr" style="position:absolute;left:-9999px">Company website</label>
+          <input id="url" name="url" type="text" inputmode="url" autocomplete="url" placeholder="e.g. mycompany.com" spellcheck="false">
+        </div>
+        <button id="go" type="submit">Calculate the odds</button>
+      </form>
+      <p class="error" id="err" role="alert"></p>
+    </div>
+    <div class="stage" aria-live="polite">
+      <svg viewBox="0 0 320 430" role="img" aria-label="A spoon that bends according to the probability">
+        <defs>
+          <linearGradient id="handleMetal" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0" stop-color="var(--steel-hi)"/>
+            <stop offset=".5" stop-color="var(--steel)"/>
+            <stop offset="1" stop-color="var(--steel-hi)"/>
+          </linearGradient>
+          <radialGradient id="bowlMetal" cx=".38" cy=".35" r=".75">
+            <stop offset="0" stop-color="var(--steel-hi)"/>
+            <stop offset=".55" stop-color="var(--steel)"/>
+            <stop offset="1" stop-color="var(--steel)"/>
+          </radialGradient>
+          <radialGradient id="bowlInner" cx=".6" cy=".65" r=".7">
+            <stop offset="0" stop-color="var(--steel)"/>
+            <stop offset="1" stop-color="var(--steel-hi)"/>
+          </radialGradient>
+        </defs>
+        <ellipse id="shadow" cx="150" cy="418" rx="40" ry="6"/>
+        <path id="handle"/>
+        <path id="shade"/>
+        <path id="shine"/>
+        <g id="bowl">
+          <ellipse cx="0" cy="-58" rx="44" ry="62" fill="url(#bowlMetal)"/>
+          <ellipse cx="3" cy="-62" rx="32" ry="48" fill="url(#bowlInner)" opacity=".85"/>
+          <ellipse cx="-14" cy="-80" rx="7" ry="16" fill="var(--steel-hi)" opacity=".9" transform="rotate(-12 -14 -80)"/>
+        </g>
+      </svg>
+      <div class="pct" id="pct">?%</div>
+      <div class="pct-label" id="pctLabel">chance of acquisition</div>
+      <div class="scan" id="scan"></div>
+    </div>
+  </section>
+
+  <section id="result" aria-live="polite">
+    <p class="verdict" id="verdict"></p>
+    <p class="domain" id="domainLine"></p>
+    <ul class="factors" id="factors"></ul>
+    <div class="actions">
+      <button id="copy" type="button">Copy result</button>
+      <button id="again" type="button" class="ghost">Try another site</button>
+    </div>
+  </section>
+</main>
+<footer>
+  <p>A parody with no connection to Bending Spoons. The score is made up: it comes from a playful calculation on the domain name, not from any real data about your company. Same site, same result.</p>
+</footer>
+
+<script>
+(function(){
+  const $ = id => document.getElementById(id);
+  const form=$("f"), input=$("url"), err=$("err"), go=$("go");
+  const pct=$("pct"), pctLabel=$("pctLabel"), scan=$("scan");
+  const result=$("result");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  const ACQUIRED = {
+    "evernote.com":"Evernote", "wetransfer.com":"WeTransfer", "vimeo.com":"Vimeo",
+    "eventbrite.com":"Eventbrite", "komoot.com":"Komoot", "meetup.com":"Meetup",
+    "aol.com":"AOL", "remini.ai":"Remini", "splice.com":"Splice", "filmicpro.com":"Filmic"
+  };
+  const GIANTS = ["google.com","apple.com","microsoft.com","amazon.com","meta.com","facebook.com","netflix.com","openai.com","anthropic.com","nvidia.com"];
+
+  function normalize(raw){
+    let s = raw.trim().toLowerCase();
+    s = s.replace(/^[a-z]+:\/\//,"").replace(/^www\./,"");
+    s = s.split(/[\/?#:]/)[0];
+    return s;
+  }
+  function hash(str){
+    let h=2166136261;
+    for(let i=0;i<str.length;i++){ h^=str.charCodeAt(i); h=Math.imul(h,16777619); }
+    return h>>>0;
+  }
+  function rng(seed){
+    return function(){
+      seed|=0; seed=seed+0x6D2B79F5|0;
+      let t=Math.imul(seed^seed>>>15,1|seed);
+      t=t+Math.imul(t^t>>>7,61|t)^t;
+      return ((t^t>>>14)>>>0)/4294967296;
+    };
+  }
+  const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+  function score(domain){
+    const r = rng(hash(domain));
+    const name = domain.split(".")[0];
+    const tld = domain.split(".").slice(-1)[0];
+
+    // fattori di base, deterministici
+    let brand = 30 + r()*55;
+    if(name.length<=6) brand+=12;
+    if(name.length>=14) brand-=15;
+
+    let stuck = 25 + r()*65;
+    if(/(note|transfer|video|event|photo|cloud|app|meet|mail|map|music|edit|scan|pdf)/.test(name)) stuck+=15;
+
+    let costs = 30 + r()*60;
+    if(/(group|holding|consulting|srl|spa)/.test(name)) costs+=8;
+
+    let subs = 20 + r()*70;
+    if(["app","io","ai","com"].includes(tld)) subs+=10;
+    if(["gov","edu","org"].includes(tld)) subs-=25;
+
+    const f = [brand,stuck,costs,subs].map(v=>Math.round(clamp(v,3,99)));
+    let p = f[0]*.3 + f[1]*.3 + f[2]*.2 + f[3]*.2;
+    p = Math.round(clamp(p*0.95 + r()*6,2,97));
+    return {f,p};
+  }
+
+  const LABELS = [
+    ["A brand everyone knows","The more famous the name, the more tempting it is."],
+    ["Loved but stalled product","Loyal users, a somewhat sleepy roadmap."],
+    ["Margins to optimize","Room to trim costs and processes."],
+    ["Subscription incoming","How easily a premium plan could appear."]
+  ];
+
+  function verdictFor(p){
+    if(p>=80) return "Pack your bags for Milan: the spoon is already bent.";
+    if(p>=60) return "You’re definitely on the radar. Someone is already reading your financials.";
+    if(p>=40) return "Interesting, but still too straight. A few years of stagnation should do it.";
+    if(p>=20) return "You stay independent for now. Enjoy it while it lasts.";
+    return "Spoon intact. You’re not their type, and that’s perfectly fine.";
+  }
+
+  /* ---- bendable spoon: the handle is a curve whose bend is concentrated near the neck ---- */
+  const elHandle=$("handle"), elShine=$("shine"), elShade=$("shade"), elBowl=$("bowl"), elShadow=$("shadow");
+  const BASE={x:150,y:410}, L=240, N=48, MAXDEG=170, LEAN=.4;
+  const kernel=[]; let ksum=0;
+  for(let i=0;i<N;i++){ const u=(i+.5)/N; const k=Math.exp(-Math.pow((u-.7)/.1,2)/2); kernel.push(k); ksum+=k; }
+  const f1=n=>n.toFixed(1);
+
+  function draw(deg){
+    const th=deg*Math.PI/180;
+    let h=-LEAN*th, x=BASE.x, y=BASE.y;
+    const R=[], Lf=[], S1=[], S2=[];
+    const ds=L/N;
+    const push=(s)=>{
+      const w=(24-11*(s/L))/2, nx=Math.cos(h), ny=-Math.sin(h);
+      R.push([x+nx*w,y+ny*w]); Lf.push([x-nx*w,y-ny*w]);
+      S1.push([x-nx*w*.45,y-ny*w*.45]); S2.push([x+nx*w*.55,y+ny*w*.55]);
+    };
+    push(0);
+    const startH=h;
+    for(let i=0;i<N;i++){
+      h+=th*kernel[i]/ksum;
+      x+=-Math.sin(h)*ds; y+=-Math.cos(h)*ds;
+      push((i+1)*ds);
+    }
+    const pts=a=>a.map(p=>f1(p[0])+" "+f1(p[1])).join(" L ");
+    const capR=12;
+    let d="M "+pts(R)+" L "+pts(Lf.slice().reverse());
+    d+=" A "+capR+" "+capR+" 0 0 0 "+f1(R[0][0])+" "+f1(R[0][1])+" Z";
+    elHandle.setAttribute("d",d);
+    elShine.setAttribute("d","M "+pts(S1.slice(2,-4)));
+    elShade.setAttribute("d","M "+pts(S2.slice(2,-4)));
+    elBowl.setAttribute("transform","translate("+f1(x)+" "+f1(y)+") rotate("+f1(-h*180/Math.PI)+")");
+    const lean=-startH*180/Math.PI;
+    elShadow.setAttribute("rx",f1(40+deg*.25));
+    elShadow.setAttribute("cx",f1(150+lean*.4));
+  }
+
+  // damped spring so the metal overshoots and settles
+  let cur=0, vel=0, target=0, raf=null, lastT=0;
+  function tick(t){
+    const dt=Math.min(.033,(t-lastT)/1000||.016); lastT=t;
+    const acc=140*(target-cur)-11*vel;
+    vel+=acc*dt; cur+=vel*dt;
+    draw(Math.max(-8,cur));
+    if(Math.abs(target-cur)<.05 && Math.abs(vel)<.05){ cur=target; draw(cur); raf=null; return; }
+    raf=requestAnimationFrame(tick);
+  }
+  function setBend(deg){
+    target=deg;
+    if(reduce){ cur=deg; draw(deg); return; }
+    if(!raf){ lastT=performance.now(); raf=requestAnimationFrame(tick); }
+  }
+  function bend(p){ setBend((p/100)*MAXDEG); }
+  draw(0);
+
+  function countTo(target){
+    if(reduce){ pct.textContent=target+"%"; return; }
+    const start=performance.now(), dur=1300;
+    function step(now){
+      const t=Math.min(1,(now-start)/dur), e=1-Math.pow(1-t,3);
+      pct.textContent=Math.round(target*e)+"%";
+      if(t<1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  const STEPS = ["Measuring brand awareness…","Counting loyal users…","Looking for a roadmap frozen since 2019…","Imagining the premium plan…"];
+  function scanning(){
+    return new Promise(res=>{
+      if(reduce){ res(); return; }
+      let i=0; scan.textContent=STEPS[0];
+      const iv=setInterval(()=>{
+        i++;
+        if(i>=STEPS.length){ clearInterval(iv); scan.textContent=""; res(); return; }
+        scan.textContent=STEPS[i];
+        setBend(i%2? 22: 6);
+      },420);
+    });
+  }
+
+  let last=null;
+
+  function render(domain, data, special){
+    const fl=$("factors"); fl.innerHTML="";
+    $("verdict").textContent = special || verdictFor(data.p);
+    $("domainLine").textContent = "Analysis for " + domain;
+    LABELS.forEach((l,i)=>{
+      const li=document.createElement("li"); li.className="factor";
+      li.innerHTML='<div class="row"><span></span><span></span></div><div class="bar"><i></i></div><p></p>';
+      li.querySelector(".row span").textContent=l[0];
+      li.querySelector(".row span:last-child").textContent=data.f[i]+"/100";
+      li.querySelector("p").textContent=l[1];
+      fl.appendChild(li);
+      requestAnimationFrame(()=>requestAnimationFrame(()=>{ li.querySelector(".bar i").style.width=data.f[i]+"%"; }));
+    });
+    result.classList.add("show");
+    result.scrollIntoView({behavior: reduce?"auto":"smooth", block:"start"});
+  }
+
+  form.addEventListener("submit", async e=>{
+    e.preventDefault();
+    err.textContent="";
+    const domain = normalize(input.value);
+    if(!domain || !/^[a-z0-9-]+(\.[a-z0-9-]+)+$/.test(domain)){
+      err.textContent="Enter a valid web address, for example mycompany.com.";
+      input.focus(); return;
+    }
+    go.disabled=true; result.classList.remove("show");
+    pct.textContent="…"; pctLabel.textContent="chance of acquisition";
+    await scanning();
+
+    let data = score(domain), special=null;
+    if(ACQUIRED[domain]){
+      data = {p:100, f:[98,95,97,99]};
+      special = ACQUIRED[domain]+"? Too late: this spoon has already been bent.";
+    } else if(domain==="bendingspoons.com"){
+      data = {p:0, f:[90,5,10,99]};
+      special = "A spoon can’t bend itself. Try another site.";
+    } else if(GIANTS.includes(domain)){
+      data = {p:Math.min(data.p,4), f:data.f};
+      special = "Too big to bend. For now.";
+    }
+
+    bend(data.p); countTo(data.p);
+    last={domain, p:data.p, v: special || verdictFor(data.p)};
+    render(domain,data,special);
+    go.disabled=false;
+  });
+
+  $("again").addEventListener("click",()=>{
+    result.classList.remove("show"); input.value=""; bend(0); pct.textContent="?%";
+    window.scrollTo({top:0, behavior: reduce?"auto":"smooth"}); input.focus();
+  });
+
+  $("copy").addEventListener("click", async ()=>{
+    if(!last) return;
+    const text = "According to the Spoonometer, "+last.domain+" has a "+last.p+"% chance of being Bending Spoons’ next acquisition. "+last.v;
+    const btn=$("copy");
+    try{ await navigator.clipboard.writeText(text); btn.textContent="Result copied"; }
+    catch(_){ btn.textContent="Copy failed"; }
+    setTimeout(()=>btn.textContent="Copy result",1800);
+  });
+})();
+</script>
+</body>
+</html>
